@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 @import 'pretendard/dist/web/variable/pretendardvariable.css';
 
+@font-face {
+  font-family: 'KBLJump-EB-Extended';
+  src: url('/src/assets/fonts/KBLJump_EB_Extended.ttf');
+}
+
 @theme {
   --breakpoint-tablet: 768px;
   --breakpoint-desktop: 1080px;
