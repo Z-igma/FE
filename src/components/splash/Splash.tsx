@@ -28,7 +28,7 @@ const Splash = () => {
       }`}
     >
       <img src={MainLogoIcon} alt="로고" />
-      <p className="font-[KBLJump-EB-Extended] text-[#FFFFFF] text-[39px] leading-10.5 tracking-[2.4px]">
+      <p className="font-[KBLJump-EB-Extended] text-[#FFFFFF] text-[1.875rem] leading-10.5 tracking-[2.4px]">
         ZIGMA
       </p>
     </div>
