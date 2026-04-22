@@ -1,7 +1,36 @@
 @import 'tailwindcss';
+@import 'pretendard/dist/web/variable/pretendardvariable.css';
 
 @theme {
   --breakpoint-tablet: 768px;
   --breakpoint-desktop: 1080px;
   --breakpoint-wide: 1280px;
+}
+
+:root {
+  --font-family: 'Pretendard Variable', Pretendard, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  font-family: var(--font-family);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
