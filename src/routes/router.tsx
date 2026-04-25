@@ -8,6 +8,7 @@ import Login from '@/pages/login/Login';
 import Map from '@/pages/map/Map';
 import NotFound from '@/pages/notFound/NotFound';
 import Schedule from '@/pages/schedule/Schedule';
+import CreateScheduleForm from '@/pages/schedule/CreateScheduleForm';
 
 const router = createBrowserRouter([
   { path: '/', element: <Splash /> },
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: '/schedule', element: <Schedule /> },
+          { path: '/schedule/create', element: <CreateScheduleForm /> },
           { path: '/account', element: <Account /> },
         ],
       },

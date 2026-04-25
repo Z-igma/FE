@@ -14,7 +14,7 @@ const Home = () => {
     if (!isLoggedIn) {
       navigate('/login');
     } else {
-      // 약속 생성 화면으로 이동
+      navigate('/schedule/create');
     }
   };
 
