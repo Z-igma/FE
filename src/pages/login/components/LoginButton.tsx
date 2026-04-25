@@ -10,7 +10,7 @@ const LoginButton = ({ type }: { type: 'kakao' | 'naver' }) => {
     >
       <img src={isKakao ? KakaoIcon : NaverIcon} alt={type} />
       <p
-        className={`font-[Pretendard] font-semibold leading-6 ${isKakao ? 'text-[#111111]' : 'text-[#FFFFFF]'}`}
+        className={`font-Pretendard font-semibold leading-6 ${isKakao ? 'text-[#111111]' : 'text-[#FFFFFF]'}`}
       >
         {isKakao ? '카카오 로그인' : '네이버 로그인'}
       </p>

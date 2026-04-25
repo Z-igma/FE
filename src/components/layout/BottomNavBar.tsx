@@ -48,7 +48,7 @@ const BottomNavBar = () => {
           className="flex flex-col items-center gap-1.25 text-xs"
         >
           <img src={pathname === path ? activeIcon : defaultIcon} alt={label} />
-          <span className="font-normal font-[Pretendard] leading-4 text-[#111111]">
+          <span className="font-normal font-Pretendard leading-4 text-[#111111]">
             {label}
           </span>
         </button>
