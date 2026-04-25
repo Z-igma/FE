@@ -20,7 +20,7 @@ const Home = () => {
 
   return isLoggedIn && hasSchedule ? (
     <div className="flex flex-col pt-8 px-4 gap-5">
-      <p className="text-[#111111] font-[Pretendard] font-semibold text-[1.75rem] whitespace-pre-line leading-10">
+      <p className="text-[#111111] font-Pretendard font-semibold text-[1.75rem] whitespace-pre-line leading-10">
         {`약속 장소\n친구들과 함께 정해요`}
       </p>
       <BottomButton
@@ -31,16 +31,16 @@ const Home = () => {
     </div>
   ) : (
     <div className="pt-8 px-4">
-      <p className="text-[#111111] font-[Pretendard] font-semibold text-[1.75rem] whitespace-pre-line leading-10">
+      <p className="text-[#111111] font-Pretendard font-semibold text-[1.75rem] whitespace-pre-line leading-10">
         {`안녕하세요,\n약속을 시작해 볼까요?`}
       </p>
       <div className="flex flex-col items-center pt-29.5">
         <img src={NoneScheduleIcon} />
         <div className="flex flex-col text-center gap-1">
-          <p className="text-[#111111] font-[Pretendard] font-semibold text-[1rem] leading-5.6">
+          <p className="text-[#111111] font-Pretendard font-semibold text-[1rem] leading-5.6">
             아직 약속이 없어요
           </p>
-          <p className="text-[#B2B2B2] font-[Pretendard] font-normal text-[1rem] leading-5.6">
+          <p className="text-[#B2B2B2] font-Pretendard font-normal text-[1rem] leading-5.6">
             친구들과 함께 약속을 정해 보세요
           </p>
         </div>

@@ -19,7 +19,7 @@ const BottomButton = ({
         className={`w-full flex py-4 gap-2 justify-center items-center rounded-[10px] ${disabled ? 'bg-[#E0E0E0] border border-[#C6C6C6]' : 'bg-[#00408E]'}`}
       >
         {icon}
-        <p className="text-[#FFFFFF] font-[Pretendard] font-semibold text-[1.125rem] leading-6">
+        <p className="text-[#FFFFFF] font-Pretendard font-semibold text-[1.125rem] leading-6">
           {text}
         </p>
       </button>
