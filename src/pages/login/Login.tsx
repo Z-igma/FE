@@ -1,7 +1,18 @@
-import MainLogoIcon from '@assets/images/mainLogoIcon.svg';
+import { useAuthStore } from '@/stores/authStore';
+import { useNavigate } from 'react-router-dom';
 import LoginButton from './components/LoginButton';
+import MainLogoIcon from '@assets/images/mainLogoIcon.svg';
 
 const Login = () => {
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
+
+  // 로그인 완료 시 홈 화면으로
+  const handleLogin = () => {
+    login();
+    navigate('/home', { replace: true });
+  };
+
   return (
     <div className="h-full flex flex-col items-center justify-center gap-10">
       <div className="flex flex-col items-center text-center gap-3">
@@ -11,8 +22,8 @@ const Login = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        <LoginButton type="kakao" />
-        <LoginButton type="naver" />
+        <LoginButton type="kakao" onClick={handleLogin} />
+        <LoginButton type="naver" onClick={handleLogin} />
       </div>
     </div>
   );

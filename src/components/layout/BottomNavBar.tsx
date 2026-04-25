@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
 import ActiveHomeIcon from '@assets/images/activeHomeIcon.svg';
 import InactiveHomeIcon from '@assets/images/inactiveHomeIcon.svg';
 import ActiveMapIcon from '@assets/images/activeMapIcon.svg';
@@ -38,13 +39,23 @@ const tabs = [
 const BottomNavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { isLoggedIn } = useAuthStore();
+
+  // 비로그인 시 기본 지도 및 홈 화면만 접근 가능
+  const handleTabClick = (path: string) => {
+    if (!isLoggedIn && path !== '/map' && path !== '/home') {
+      navigate('/login');
+      return;
+    }
+    navigate(path);
+  };
 
   return (
     <nav className="flex justify-between items-center fixed bottom-5 w-full max-w-[393px] px-9.5 py-3.75 bg-[#FFFFFF] shadow-[0_4px_20px_0_rgba(17,17,17,0.04)] rounded-t-[20px] left-1/2 -translate-x-1/2">
       {tabs.map(({ path, label, defaultIcon, activeIcon }) => (
         <button
           key={path}
-          onClick={() => navigate(path)}
+          onClick={() => handleTabClick(path)}
           className="flex flex-col items-center gap-1.25 text-xs"
         >
           <img src={pathname === path ? activeIcon : defaultIcon} alt={label} />
