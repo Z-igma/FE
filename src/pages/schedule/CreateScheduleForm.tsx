@@ -2,11 +2,28 @@ import { useState } from 'react';
 import Header from '@/components/layout/Header';
 import CreateScheduleTitle from './components/CreateScheduleTitle';
 import DropdownIcon from '@/assets/images/dropdownIcon.svg';
+import DatePickerCalendar from './components/DatePickerCalendar';
 
 const CreateScheduleForm = () => {
   const [isMultiVote, setIsMultiVote] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isTimeOpen, setIsTimeOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+  // 날짜 표시 포맷 함수
+  const formatDate = (date: Date) => {
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dayOfWeek = DAYS[date.getDay()];
+    return `${month}월 ${day}일 (${dayOfWeek})`;
+  };
+
+  const handleSelectDate = (date: Date) => {
+    setSelectedDate(date);
+    setIsDateOpen(false);
+  };
 
   return (
     <div>
@@ -16,7 +33,7 @@ const CreateScheduleForm = () => {
           <CreateScheduleTitle title="약속명" />
           <input
             placeholder="약속명을 입력해 주세요"
-            className="px-3 py-3.75 bg-[#FAFAFA] border border-[#C6C6C6] rounded-[10px] text-[#111111] placeholder:text-[#C6C6C6] font-Pretendard text-[0.875rem] font-medium leading-5"
+            className="px-3 py-3.75 bg-[#FAFAFA] border border-[#C6C6C6] rounded-[10px] text-[#111111] placeholder:text-[#C6C6C6] font-Pretendard text-[0.875rem] font-medium leading-5 focus:outline-none"
           />
         </div>
 
@@ -28,8 +45,14 @@ const CreateScheduleForm = () => {
               onClick={() => setIsDateOpen(!isDateOpen)}
               className="flex justify-between items-center w-43 px-2.5 py-3.75 bg-[#FAFAFA] border border-[#C6C6C6] rounded-[10px] cursor-pointer caret-transparent focus:outline-none"
             >
-              <p className="font-Pretendard text-[0.875rem] font-medium leading-5 text-[#C6C6C6]">
-                날짜를 선택해 주세요
+              <p
+                className={`font-Pretendard text-[0.875rem] font-medium leading-5 ${
+                  selectedDate ? 'text-[#111111]' : 'text-[#C6C6C6]'
+                }`}
+              >
+                {selectedDate
+                  ? formatDate(selectedDate)
+                  : '날짜를 선택해 주세요'}
               </p>
               <img
                 src={DropdownIcon}
@@ -51,8 +74,12 @@ const CreateScheduleForm = () => {
             </div>
           </div>
           {isDateOpen && (
-            <div className="mt-3 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
+            <div className="px-10.5 mt-3 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
               {/* 날짜 선택 캘린더 추가 */}
+              <DatePickerCalendar
+                selectedDate={selectedDate}
+                setSelectedDate={handleSelectDate}
+              />
             </div>
           )}
           {isTimeOpen && (
