@@ -4,11 +4,14 @@ import CreateScheduleTitle from './components/CreateScheduleTitle';
 import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 import DatePickerCalendar from './components/DatePickerCalendar';
 
+const TOPICS = ['식사', '카페', '영화', '액티비티', '스터디', '파티'];
+
 const CreateScheduleForm = () => {
   const [isMultiVote, setIsMultiVote] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [isTimeOpen, setIsTimeOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -91,6 +94,25 @@ const CreateScheduleForm = () => {
 
         <div className="flex flex-col gap-2">
           <CreateScheduleTitle title="약속 주제" />
+          <div className="grid grid-cols-3 gap-2.5">
+            {TOPICS.map(topic => (
+              <div
+                key={topic}
+                onClick={() => setSelectedTopic(topic)}
+                className={`flex justify-center items-center py-3.75 border border-[#C6C6C6] rounded-[10px] cursor-pointer ${
+                  selectedTopic === topic ? 'bg-[#00408E]' : 'bg-[#FAFAFA] '
+                }`}
+              >
+                <p
+                  className={`text-[0.875rem] font-Pretendard text-[#C6C6C6] leading-5 ${
+                    selectedTopic === topic ? 'font-semibold' : 'font-light'
+                  }`}
+                >
+                  {topic}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex justify-between items-center">
