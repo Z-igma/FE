@@ -3,8 +3,22 @@ import Header from '@/components/layout/Header';
 import CreateScheduleTitle from './components/CreateScheduleTitle';
 import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 import DatePickerCalendar from './components/DatePickerCalendar';
+import TimeScrollSelector, {
+  type TimeIndex,
+} from './components/TimeScrollSelector';
+import BottomButton from '@/components/common/BottomButton';
 
 const TOPICS = ['식사', '카페', '영화', '액티비티', '스터디', '파티'];
+
+const getNowIndex = (): TimeIndex => {
+  const now = new Date();
+  const hours12 = now.getHours() % 12;
+  return {
+    ap: now.getHours() >= 12 ? 1 : 0,
+    hr: hours12 === 0 ? 11 : hours12 - 1,
+    mn: now.getMinutes(),
+  };
+};
 
 const CreateScheduleForm = () => {
   const [isMultiVote, setIsMultiVote] = useState(false);
@@ -12,6 +26,10 @@ const CreateScheduleForm = () => {
   const [isTimeOpen, setIsTimeOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+
+  // 지금 시간을 기본 값으로 설정
+  const [timeIndex, setTimeIndex] = useState<TimeIndex>(getNowIndex);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -67,8 +85,12 @@ const CreateScheduleForm = () => {
               onClick={() => setIsTimeOpen(!isTimeOpen)}
               className="flex justify-between items-center w-43 px-2.5 py-3.75 bg-[#FAFAFA] border border-[#C6C6C6] rounded-[10px] cursor-pointer caret-transparent focus:outline-none"
             >
-              <p className="font-Pretendard text-[0.875rem] font-medium leading-5 text-[#C6C6C6]">
-                시간을 선택해 주세요
+              <p
+                className={`font-Pretendard text-[0.875rem] font-medium leading-5 ${
+                  selectedTime ? 'text-[#111111]' : 'text-[#C6C6C6]'
+                }`}
+              >
+                {selectedTime ?? '시간을 선택해 주세요'}
               </p>
               <img
                 src={DropdownIcon}
@@ -88,6 +110,13 @@ const CreateScheduleForm = () => {
           {isTimeOpen && (
             <div className="mt-1 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
               {/* 시간 선택 추가 */}
+              <TimeScrollSelector
+                initialIndex={timeIndex}
+                onChange={(time, index) => {
+                  setSelectedTime(time);
+                  setTimeIndex(index);
+                }}
+              />
             </div>
           )}
         </div>
@@ -136,6 +165,8 @@ const CreateScheduleForm = () => {
           </div>
         </div>
       </div>
+
+      <BottomButton text="만들기" />
     </div>
   );
 };
