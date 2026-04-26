@@ -1,12 +1,15 @@
 interface CreateScheduleTitleProps {
   title: string;
+  error?: boolean;
 }
 
-const CreateScheduleTitle = ({ title }: CreateScheduleTitleProps) => {
+const CreateScheduleTitle = ({ title, error }: CreateScheduleTitleProps) => {
   return (
-    <div className="">
-      <p className="text-[#111111] font-Pretendard font-semibold text-[0.75rem] leading-3">
-        {title}
+    <div>
+      <p
+        className={`font-Pretendard font-semibold text-[0.75rem] leading-3 ${error ? 'text-[#FF0909]' : 'text-[#111111]'}`}
+      >
+        {title} {error && <span>*</span>}
       </p>
     </div>
   );

@@ -4,7 +4,7 @@ import CalendarNextIcon from '@/assets/images/calendarNextIcon.svg';
 
 interface DatePickerCalendarProps {
   selectedDate: Date | null;
-  setSelectedDate: (date: Date) => void;
+  setSelectedDate: (date: Date | null) => void;
 }
 
 const DatePickerCalendar = ({
@@ -109,7 +109,10 @@ const DatePickerCalendar = ({
                 return (
                   <p
                     key={dateIdx}
-                    onClick={() => !isPast && setSelectedDate(date)}
+                    onClick={() => {
+                      if (isPast) return;
+                      setSelectedDate(isSelected ? null : date);
+                    }}
                     className={`flex items-center justify-center w-7 h-7 text-center font-[SF-Pro] text-[0.875rem] font-medium ${
                       !isCurrentMonth
                         ? 'invisible'
