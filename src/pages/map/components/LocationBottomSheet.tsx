@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import ProposalMemberIcon from '@/assets/images/map/proposalMemberIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
+import NomineeCheckIcon from '@/assets/images/map/nomineeCheckIcon.svg';
 
 interface LocationBottomSheetProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ const LocationBottomSheet = ({
   address,
   proposedBy,
 }: LocationBottomSheetProps) => {
+  const [isAdded, setIsAdded] = useState(false);
+
   return (
     <BottomSheet
       isOpen={isOpen}
@@ -37,8 +41,14 @@ const LocationBottomSheet = ({
               </p>
             </div>
           </div>
-          <div className="w-9 h-9 p-1.5 bg-[#00408E] rounded-full">
-            <img src={PlusIcon} className="w-6 h-6" />
+          <div
+            className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
+            onClick={() => setIsAdded(prev => !prev)}
+          >
+            <img
+              src={isAdded ? NomineeCheckIcon : PlusIcon}
+              className="w-6 h-6"
+            />
           </div>
         </div>
         <p className="whitespace-pre-line text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5">
