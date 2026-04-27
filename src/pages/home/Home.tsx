@@ -100,11 +100,13 @@ const Home = () => {
         </div>
       </div>
 
-      <BottomButton
-        icon={<img src={PlusIcon} />}
-        text="새 약속 만들기"
-        onClick={handleBottomButton}
-      />
+      <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
+        <BottomButton
+          icon={<img src={PlusIcon} />}
+          text="새 약속 만들기"
+          onClick={handleBottomButton}
+        />
+      </div>
     </div>
   ) : (
     <div className="pt-8 px-4">
@@ -122,11 +124,13 @@ const Home = () => {
           </p>
         </div>
       </div>
-      <BottomButton
-        icon={<img src={PlusIcon} />}
-        text="첫 약속 만들기"
-        onClick={handleBottomButton}
-      />
+      <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
+        <BottomButton
+          icon={<img src={PlusIcon} />}
+          text="첫 약속 만들기"
+          onClick={handleBottomButton}
+        />
+      </div>
     </div>
   );
 };
