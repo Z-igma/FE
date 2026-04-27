@@ -7,6 +7,7 @@ import TimeScrollSelector, {
   type TimeIndex,
 } from './components/TimeScrollSelector';
 import BottomButton from '@/components/common/BottomButton';
+import { useNavigate } from 'react-router-dom';
 
 const TOPICS = ['식사', '카페', '영화', '액티비티', '스터디', '파티'];
 
@@ -21,12 +22,13 @@ const getNowIndex = (): TimeIndex => {
 };
 
 const CreateScheduleForm = () => {
+  const navigate = useNavigate();
+
   const [scheduleName, setScheduleName] = useState('');
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isTimeOpen, setIsTimeOpen] = useState(false);
-  // 지금 시간을 기본 값으로 설정
-  const [timeIndex, setTimeIndex] = useState<TimeIndex>(getNowIndex);
+  const [timeIndex, setTimeIndex] = useState<TimeIndex>(getNowIndex); // 지금 시간을 기본 값으로 설정
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isMultiVote, setIsMultiVote] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
@@ -48,12 +50,12 @@ const CreateScheduleForm = () => {
     return `${month}월 ${day}일 (${dayOfWeek})`;
   };
 
-  const handleSelectDate = (date: Date | null) => {
-    setSelectedDate(date);
-  };
-
   const isValid =
     !!scheduleName && !!selectedDate && !!selectedTime && !!selectedTopic;
+
+  const handleSubmit = () => {
+    navigate('/home');
+  };
 
   return (
     <div>
@@ -83,7 +85,7 @@ const CreateScheduleForm = () => {
               (touched.date && !selectedDate) || (touched.time && !selectedTime)
             }
           />
-          {/* 날짜 선택 토글 */}
+          {/* 날짜 선택 드롭다운 */}
           <div className="flex gap-4">
             <div
               onClick={() => {
@@ -110,7 +112,7 @@ const CreateScheduleForm = () => {
                 className={`transition-transform duration-200 ${isDateOpen ? 'rotate-180' : ''}`}
               />
             </div>
-            {/* 시간 선택 토글 */}
+            {/* 시간 선택 드롭다운 */}
             <div
               onClick={() => {
                 setTouched(prev => ({
@@ -141,16 +143,19 @@ const CreateScheduleForm = () => {
           </div>
           {isDateOpen && (
             <div className="px-10.5 mt-3 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
-              {/* 날짜 선택 캘린더 추가 */}
+              {/* 날짜 선택 캘린더 */}
               <DatePickerCalendar
                 selectedDate={selectedDate}
-                setSelectedDate={handleSelectDate}
+                setSelectedDate={date => {
+                  setSelectedDate(date);
+                  setIsDateOpen(false);
+                }}
               />
             </div>
           )}
           {isTimeOpen && (
             <div className="mt-1 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
-              {/* 시간 선택 추가 */}
+              {/* 시간 선택 */}
               <TimeScrollSelector
                 initialIndex={timeIndex}
                 onChange={(time, index) => {
@@ -237,7 +242,7 @@ const CreateScheduleForm = () => {
         </div>
       </div>
 
-      <BottomButton text="만들기" disabled={!isValid} />
+      <BottomButton text="만들기" disabled={!isValid} onClick={handleSubmit} />
     </div>
   );
 };
