@@ -90,7 +90,7 @@ const DatePickerCalendar = ({
           {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map(day => (
             <p
               key={day}
-              className="text-center font-[SF-Pro] text-[0.625rem] text-[#7E818C] font-medium"
+              className="flex items-center justify-center w-7 h-7 font-[SF-Pro] text-[0.625rem] text-[#7E818C] font-medium"
             >
               {day}
             </p>

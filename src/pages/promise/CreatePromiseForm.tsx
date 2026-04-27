@@ -90,6 +90,7 @@ const CreatePromiseForm = () => {
             <div
               onClick={() => {
                 setTouched(prev => ({ ...prev, promiseName: true }));
+                setIsTimeOpen(false);
                 setIsDateOpen(!isDateOpen);
               }}
               className={`flex flex-1 justify-between items-center px-2.5 py-3.75 border rounded-[10px] cursor-pointer ${
@@ -120,6 +121,7 @@ const CreatePromiseForm = () => {
                   promiseName: true,
                   date: true,
                 }));
+                setIsDateOpen(false);
                 setIsTimeOpen(!isTimeOpen);
               }}
               className={`flex flex-1 justify-between items-center px-2.5 py-3.75 border rounded-[10px] cursor-pointer ${
