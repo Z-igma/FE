@@ -1,22 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
-import ScheduleCard from './components/ScheduleCard';
+import PromiseCard from './components/PromiseCard';
 import BottomButton from '@/components/common/BottomButton';
-import NoneScheduleIcon from '@/assets/images/home/noneScheduleIcon.svg';
+import NonePromiseIcon from '@/assets/images/home/nonePromiseIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
 
 const Home = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuthStore();
 
-  const schedules = [
+  const promises = [
     {
       id: 1,
       title: '저녁 모임',
-      planStatus: '장소 미정',
+      planStatus: '진행 중',
       promisedAt: '2026-05-28T21:26:12',
       dayOfWeek: '목',
-      memberCount: 1,
+      memberCount: 3,
     },
     {
       id: 2,
@@ -27,16 +27,16 @@ const Home = () => {
       memberCount: 1,
     },
   ];
-  const hasSchedule = schedules.length > 0;
+  const hasPromise = promises.length > 0;
 
   const now = new Date();
 
-  const activeSchedules = schedules.filter(
-    schedule => new Date(schedule.promisedAt) >= now,
+  const activePromises = promises.filter(
+    promise => new Date(promise.promisedAt) >= now,
   );
 
-  const pastSchedules = schedules.filter(
-    schedule => new Date(schedule.promisedAt) < now,
+  const pastPromises = promises.filter(
+    promise => new Date(promise.promisedAt) < now,
   );
 
   const formatDate = (promisedAt: string, dayOfWeek: string) => {
@@ -51,11 +51,11 @@ const Home = () => {
     if (!isLoggedIn) {
       navigate('/login');
     } else {
-      navigate('/schedule/create');
+      navigate('/promise/create');
     }
   };
 
-  return isLoggedIn && hasSchedule ? (
+  return isLoggedIn && hasPromise ? (
     <div className="flex flex-col pt-10 px-4 gap-5">
       <div className="flex flex-col gap-2.75">
         <p className="text-[#111111] font-Pretendard font-semibold text-[1.75rem] whitespace-pre-line leading-10">
@@ -68,16 +68,16 @@ const Home = () => {
 
       <div className="flex flex-col gap-2">
         <p className="text-[#B2B2B2] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
-          진행 중인 약속 {activeSchedules.length}
+          진행 중인 약속 {activePromises.length}
         </p>
         <div className="flex flex-col gap-5">
-          {activeSchedules.map(schedule => (
-            <ScheduleCard
-              key={schedule.id}
-              planStatus={schedule.planStatus}
-              title={schedule.title}
-              date={formatDate(schedule.promisedAt, schedule.dayOfWeek)}
-              memberCount={schedule.memberCount}
+          {activePromises.map(promise => (
+            <PromiseCard
+              key={promise.id}
+              planStatus={promise.planStatus}
+              title={promise.title}
+              date={formatDate(promise.promisedAt, promise.dayOfWeek)}
+              memberCount={promise.memberCount}
             />
           ))}
         </div>
@@ -85,16 +85,16 @@ const Home = () => {
 
       <div className="flex flex-col gap-2">
         <p className="text-[#B2B2B2] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
-          지난 약속 {pastSchedules.length}
+          지난 약속 {pastPromises.length}
         </p>
         <div className="flex flex-col gap-5">
-          {pastSchedules.map(schedule => (
-            <ScheduleCard
-              key={schedule.id}
-              planStatus={schedule.planStatus}
-              title={schedule.title}
-              date={formatDate(schedule.promisedAt, schedule.dayOfWeek)}
-              memberCount={schedule.memberCount}
+          {pastPromises.map(promise => (
+            <PromiseCard
+              key={promise.id}
+              planStatus={promise.planStatus}
+              title={promise.title}
+              date={formatDate(promise.promisedAt, promise.dayOfWeek)}
+              memberCount={promise.memberCount}
             />
           ))}
         </div>
@@ -112,7 +112,7 @@ const Home = () => {
         {`안녕하세요,\n약속을 시작해 볼까요?`}
       </p>
       <div className="flex flex-col items-center pt-29.5">
-        <img src={NoneScheduleIcon} />
+        <img src={NonePromiseIcon} />
         <div className="flex flex-col text-center gap-1">
           <p className="text-[#111111] font-Pretendard font-semibold text-[1rem] leading-5.6">
             아직 약속이 없어요

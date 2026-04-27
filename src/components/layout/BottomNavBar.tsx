@@ -4,8 +4,8 @@ import ActiveHomeIcon from '@assets/images/activeHomeIcon.svg';
 import InactiveHomeIcon from '@assets/images/inactiveHomeIcon.svg';
 import ActiveMapIcon from '@assets/images/activeMapIcon.svg';
 import InactiveMapIcon from '@assets/images/inactiveMapIcon.svg';
-import ActiveScheduleIcon from '@assets/images/activeScheduleIcon.svg';
-import InactiveScheduleIcon from '@assets/images/inactiveScheduleIcon.svg';
+import ActivePromiseIcon from '@assets/images/activePromiseIcon.svg';
+import InactivePromiseIcon from '@assets/images/inactivePromiseIcon.svg';
 import ActiveAccountIcon from '@assets/images/activeAccountIcon.svg';
 import InactiveAccountIcon from '@assets/images/inactiveAccountIcon.svg';
 
@@ -23,10 +23,10 @@ const tabs = [
     activeIcon: ActiveMapIcon,
   },
   {
-    path: '/schedule',
+    path: '/promise',
     label: '일정',
-    defaultIcon: InactiveScheduleIcon,
-    activeIcon: ActiveScheduleIcon,
+    defaultIcon: InactivePromiseIcon,
+    activeIcon: ActivePromiseIcon,
   },
   {
     path: '/account',

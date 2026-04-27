@@ -117,7 +117,7 @@ const DatePickerCalendar = ({
                       !isCurrentMonth
                         ? 'invisible'
                         : isSelected
-                          ? 'text-[#FDFDFD] bg-[#0F2552] rounded-full'
+                          ? 'text-[#FDFDFD] bg-[#00408E] rounded-full'
                           : isPast
                             ? 'text-[#C6C6C6] cursor-default'
                             : 'text-[#0F2552]'

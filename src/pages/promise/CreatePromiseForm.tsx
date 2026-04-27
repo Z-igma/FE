@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CreateScheduleTitle from './components/CreateScheduleTitle';
+import CreatePromiseTitle from './components/CreatePromiseTitle';
 import DatePickerCalendar from './components/DatePickerCalendar';
 import TimeScrollSelector, {
   type TimeIndex,
@@ -21,10 +21,10 @@ const getNowIndex = (): TimeIndex => {
   };
 };
 
-const CreateScheduleForm = () => {
+const CreatePromiseForm = () => {
   const navigate = useNavigate();
 
-  const [scheduleName, setScheduleName] = useState('');
+  const [promiseName, setPromiseName] = useState('');
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isTimeOpen, setIsTimeOpen] = useState(false);
@@ -34,7 +34,7 @@ const CreateScheduleForm = () => {
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   const [touched, setTouched] = useState({
-    scheduleName: false,
+    promiseName: false,
     date: false,
     time: false,
     topic: false,
@@ -51,7 +51,7 @@ const CreateScheduleForm = () => {
   };
 
   const isValid =
-    !!scheduleName && !!selectedDate && !!selectedTime && !!selectedTopic;
+    !!promiseName && !!selectedDate && !!selectedTime && !!selectedTopic;
 
   const handleSubmit = () => {
     navigate('/home');
@@ -62,16 +62,16 @@ const CreateScheduleForm = () => {
       <Header title="새 약속 만들기" />
       <div className="flex flex-col pt-5 px-4 gap-5">
         <div className="flex flex-col gap-2">
-          <CreateScheduleTitle
+          <CreatePromiseTitle
             title="약속명"
-            error={touched.scheduleName && !scheduleName}
+            error={touched.promiseName && !promiseName}
           />
           <input
-            value={scheduleName}
-            onChange={e => setScheduleName(e.target.value)}
+            value={promiseName}
+            onChange={e => setPromiseName(e.target.value)}
             placeholder="약속명을 입력해 주세요"
             className={`px-3 py-3.75 border rounded-[10px] text-[#111111] placeholder:text-[#C6C6C6] font-Pretendard text-[0.875rem] font-medium leading-5 focus:outline-none ${
-              touched.scheduleName && !scheduleName
+              touched.promiseName && !promiseName
                 ? 'bg-[rgba(255,9,9,0.10)] border-[#FF0909]'
                 : 'bg-[#FAFAFA] border-[#C6C6C6]'
             }`}
@@ -79,7 +79,7 @@ const CreateScheduleForm = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <CreateScheduleTitle
+          <CreatePromiseTitle
             title="날짜 · 시간"
             error={
               (touched.date && !selectedDate) || (touched.time && !selectedTime)
@@ -89,7 +89,7 @@ const CreateScheduleForm = () => {
           <div className="flex gap-4">
             <div
               onClick={() => {
-                setTouched(prev => ({ ...prev, scheduleName: true }));
+                setTouched(prev => ({ ...prev, promiseName: true }));
                 setIsDateOpen(!isDateOpen);
               }}
               className={`flex flex-1 justify-between items-center px-2.5 py-3.75 border rounded-[10px] cursor-pointer ${
@@ -117,7 +117,7 @@ const CreateScheduleForm = () => {
               onClick={() => {
                 setTouched(prev => ({
                   ...prev,
-                  scheduleName: true,
+                  promiseName: true,
                   date: true,
                 }));
                 setIsTimeOpen(!isTimeOpen);
@@ -168,7 +168,7 @@ const CreateScheduleForm = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <CreateScheduleTitle
+          <CreatePromiseTitle
             title="약속 주제"
             error={touched.topic && !selectedTopic}
           />
@@ -179,7 +179,7 @@ const CreateScheduleForm = () => {
                 onClick={() => {
                   setTouched(prev => ({
                     ...prev,
-                    scheduleName: true,
+                    promiseName: true,
                     date: true,
                     time: true,
                     topic: true,
@@ -203,11 +203,11 @@ const CreateScheduleForm = () => {
         </div>
 
         <div className="flex justify-between items-center">
-          <CreateScheduleTitle title="참여자 초대" />
+          <CreatePromiseTitle title="참여자 초대" />
           <button
             onClick={() => {
               setTouched({
-                scheduleName: true,
+                promiseName: true,
                 date: true,
                 time: true,
                 topic: true,
@@ -222,11 +222,11 @@ const CreateScheduleForm = () => {
         </div>
 
         <div className="flex justify-between">
-          <CreateScheduleTitle title="장소 복수 투표" />
+          <CreatePromiseTitle title="장소 복수 투표" />
           <div
             onClick={() => {
               setTouched({
-                scheduleName: true,
+                promiseName: true,
                 date: true,
                 time: true,
                 topic: true,
@@ -247,4 +247,4 @@ const CreateScheduleForm = () => {
   );
 };
 
-export default CreateScheduleForm;
+export default CreatePromiseForm;

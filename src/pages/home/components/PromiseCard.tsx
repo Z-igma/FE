@@ -2,7 +2,7 @@ import CardPeopleIcon from '@/assets/images/home/cardPeopleIcon.svg';
 import CardDetailButtonIcon from '@/assets/images/home/cardDetailButtonIcon.svg';
 import MemberInvitePlusIcon from '@/assets/images/home/memberInvitePlusIcon.svg';
 
-interface ScheduleCardProps {
+interface PromiseCardProps {
   planStatus: string;
   title: string;
   date: string;
@@ -30,12 +30,12 @@ const STATUS_CONFIG: Record<
   },
 };
 
-const ScheduleCard = ({
+const PromiseCard = ({
   planStatus,
   title,
   date,
   memberCount,
-}: ScheduleCardProps) => {
+}: PromiseCardProps) => {
   const config = STATUS_CONFIG[planStatus];
   const isCompleted = planStatus === '확정 완료';
 
@@ -87,4 +87,4 @@ const ScheduleCard = ({
   );
 };
 
-export default ScheduleCard;
+export default PromiseCard;

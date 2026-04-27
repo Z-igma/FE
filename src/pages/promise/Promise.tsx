@@ -1,4 +1,4 @@
-const Schedule = () => {
+const Promise = () => {
   return (
     <>
       <p>일정 페이지</p>
@@ -6,4 +6,4 @@ const Schedule = () => {
   );
 };
 
-export default Schedule;
+export default Promise;

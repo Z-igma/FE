@@ -1,9 +1,9 @@
-interface CreateScheduleTitleProps {
+interface CreatePromiseTitleProps {
   title: string;
   error?: boolean;
 }
 
-const CreateScheduleTitle = ({ title, error }: CreateScheduleTitleProps) => {
+const CreatePromiseTitle = ({ title, error }: CreatePromiseTitleProps) => {
   return (
     <div>
       <p
@@ -15,4 +15,4 @@ const CreateScheduleTitle = ({ title, error }: CreateScheduleTitleProps) => {
   );
 };
 
-export default CreateScheduleTitle;
+export default CreatePromiseTitle;
