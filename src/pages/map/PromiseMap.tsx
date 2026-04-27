@@ -15,10 +15,17 @@ const PromiseMap = () => {
     address: string;
     proposedBy: string;
   } | null>(null);
-  const [markerPosition, setMarkerPosition] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [markers, setMarkers] = useState<
+    {
+      lat: number;
+      lng: number;
+      placeName: string;
+      address: string;
+    }[]
+  >([]);
+  const [selectedMarkerIndex, setSelectedMarkerIndex] = useState<number | null>(
+    null,
+  );
 
   // 위치 허용 시 사용자 위치 기준으로 지도 표시
   useEffect(() => {
@@ -65,8 +72,6 @@ const PromiseMap = () => {
     const lat = mouseEvent.latLng.getLat();
     const lng = mouseEvent.latLng.getLng();
 
-    setMarkerPosition({ lat, lng });
-
     const geocoder = new kakao.maps.services.Geocoder();
 
     geocoder.coord2Address(lng, lat, (result, status) => {
@@ -77,12 +82,8 @@ const PromiseMap = () => {
         : result[0].address.address_name;
 
       findNearestPlace(lat, lng, placeName => {
-        setSelectedPlace({
-          placeName,
-          address,
-          proposedBy: '나',
-        });
-
+        setMarkers(prev => [...prev, { lat, lng, placeName, address }]);
+        setSelectedPlace({ placeName, address, proposedBy: '나' });
         setIsSheetOpen(true);
       });
     });
@@ -96,15 +97,14 @@ const PromiseMap = () => {
         onClick={handleMapClick}
       >
         {/* 클릭한 위치에 마커 표시 */}
-        {markerPosition && (
+        {markers.map((marker, i) => (
           <MapMarker
-            position={markerPosition}
-            image={{
-              src: CustomMarkerIcon,
-              size: { width: 30, height: 30 },
-            }}
+            key={i}
+            position={{ lat: marker.lat, lng: marker.lng }}
+            image={{ src: CustomMarkerIcon, size: { width: 30, height: 30 } }}
+            onClick={() => setSelectedMarkerIndex(i)}
           />
-        )}
+        ))}
       </Map>
       <div className="absolute top-0 left-0 pl-4 pt-5 z-10">
         <div className="px-4.5 py-4 flex flex-col items-start gap-1 bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.10)]">
