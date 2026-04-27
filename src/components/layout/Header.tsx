@@ -3,7 +3,7 @@ import BackButtonIcon from '@/assets/images/backButtonIcon.svg';
 
 interface HeaderProps {
   title: string;
-  rightIcon?: React.ReactNode;
+  rightIcon?: string;
   onRightClick?: () => void;
 }
 
@@ -17,7 +17,12 @@ const Header = ({ title, rightIcon, onRightClick }: HeaderProps) => {
         {title}
       </p>
       {rightIcon ? (
-        <div onClick={onRightClick}>{rightIcon}</div>
+        <img
+          src={rightIcon}
+          alt="설정"
+          onClick={onRightClick}
+          className="w-7 cursor-pointer"
+        />
       ) : (
         <div className="w-7" />
       )}
