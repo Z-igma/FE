@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
-import NoneScheduleIcon from '@/assets/images/home/noneScheduleIcon.svg';
-import BottomButton from '@/components/common/BottomButton';
-import PlusIcon from '@/assets/images/plusIcon.svg';
 import ScheduleCard from './components/ScheduleCard';
+import BottomButton from '@/components/common/BottomButton';
+import NoneScheduleIcon from '@/assets/images/home/noneScheduleIcon.svg';
+import PlusIcon from '@/assets/images/plusIcon.svg';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const Home = () => {
 
       <div className="flex flex-col gap-2">
         <p className="text-[#B2B2B2] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
-          진행 중인 약속
+          진행 중인 약속 {activeSchedules.length}
         </p>
         <div className="flex flex-col gap-5">
           {activeSchedules.map(schedule => (
@@ -85,7 +85,7 @@ const Home = () => {
 
       <div className="flex flex-col gap-2">
         <p className="text-[#B2B2B2] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
-          지난 약속
+          지난 약속 {pastSchedules.length}
         </p>
         <div className="flex flex-col gap-5">
           {pastSchedules.map(schedule => (

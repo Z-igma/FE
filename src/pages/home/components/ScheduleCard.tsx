@@ -1,5 +1,6 @@
 import CardPeopleIcon from '@/assets/images/home/cardPeopleIcon.svg';
 import CardDetailButtonIcon from '@/assets/images/home/cardDetailButtonIcon.svg';
+import MemberInvitePlusIcon from '@/assets/images/home/memberInvitePlusIcon.svg';
 
 interface ScheduleCardProps {
   planStatus: string;
@@ -48,7 +49,9 @@ const ScheduleCard = ({
           <div
             className={`flex items-center gap-1.5 py-1.5 px-1.75 rounded-full ${config.badge}`}
           >
-            <div className={`w-2.5 h-2.5 rounded-full ${config.dot}`} />
+            {planStatus !== '확정 완료' && (
+              <div className={`w-2.5 h-2.5 rounded-full ${config.dot}`} />
+            )}
             <p className="font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               {config.label}
             </p>
@@ -59,20 +62,27 @@ const ScheduleCard = ({
         </p>
       </div>
 
-      {!isCompleted && (
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-1.25">
-            <img src={CardPeopleIcon} />
-            <p className="text-[#111111] font-Pretendard font-regular text-[0.875rem] leading-5">
-              {memberCount}명
+      {!isCompleted &&
+        (memberCount === 1 ? (
+          <div className="flex items-center p-1.5 w-61 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
+            <img src={MemberInvitePlusIcon} />
+            <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
+              친구를 초대하기
             </p>
           </div>
-
-          <div className="w-7.5 h-7.5 flex items-center justify-center bg-[#E4E4E4] rounded-full">
-            <img src={CardDetailButtonIcon} />
+        ) : (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.25">
+              <img src={CardPeopleIcon} />
+              <p className="text-[#111111] font-Pretendard font-regular text-[0.875rem] leading-5">
+                {memberCount}명
+              </p>
+            </div>
+            <div className="w-7.5 h-7.5 flex items-center justify-center bg-[#E4E4E4] rounded-full">
+              <img src={CardDetailButtonIcon} />
+            </div>
           </div>
-        </div>
-      )}
+        ))}
     </div>
   );
 };

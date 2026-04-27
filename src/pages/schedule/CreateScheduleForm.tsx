@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import Header from '@/components/layout/Header';
+import { useNavigate } from 'react-router-dom';
 import CreateScheduleTitle from './components/CreateScheduleTitle';
-import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 import DatePickerCalendar from './components/DatePickerCalendar';
 import TimeScrollSelector, {
   type TimeIndex,
 } from './components/TimeScrollSelector';
+import Header from '@/components/layout/Header';
+import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 import BottomButton from '@/components/common/BottomButton';
-import { useNavigate } from 'react-router-dom';
 
 const TOPICS = ['식사', '카페', '영화', '액티비티', '스터디', '파티'];
 
