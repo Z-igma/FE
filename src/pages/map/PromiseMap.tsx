@@ -30,7 +30,34 @@ const PromiseMap = () => {
     });
   }, []);
 
-  // 지도 클릭 시 마커 추가 및 역지오코딩으로 주소 조회
+  // 클릭한 좌표 주변에서 가장 가까운 가게명 찾기
+  const findNearestPlace = (
+    lat: number,
+    lng: number,
+    callback: (placeName: string) => void,
+  ) => {
+    const places = new kakao.maps.services.Places();
+    const location = new kakao.maps.LatLng(lat, lng);
+
+    places.categorySearch(
+      'FD6', // 음식점 카테고리
+      (result, status) => {
+        if (status === kakao.maps.services.Status.OK && result.length > 0) {
+          callback(result[0].place_name);
+          return;
+        }
+
+        callback('선택한 위치');
+      },
+      {
+        location,
+        radius: 50,
+        sort: kakao.maps.services.SortBy.DISTANCE,
+      },
+    );
+  };
+
+  // 지도 클릭 시 마커 추가 + 주소 조회 + 주변 가게명 조회
   const handleMapClick = (
     _: kakao.maps.Map,
     mouseEvent: kakao.maps.event.MouseEvent,
@@ -41,24 +68,28 @@ const PromiseMap = () => {
     setMarkerPosition({ lat, lng });
 
     const geocoder = new kakao.maps.services.Geocoder();
-    geocoder.coord2Address(lng, lat, (result, status) => {
-      if (status === kakao.maps.services.Status.OK) {
-        const address = result[0].road_address
-          ? result[0].road_address.address_name
-          : result[0].address.address_name;
 
+    geocoder.coord2Address(lng, lat, (result, status) => {
+      if (status !== kakao.maps.services.Status.OK) return;
+
+      const address = result[0].road_address
+        ? result[0].road_address.address_name
+        : result[0].address.address_name;
+
+      findNearestPlace(lat, lng, placeName => {
         setSelectedPlace({
-          placeName: '선택한 위치',
+          placeName,
           address,
           proposedBy: '나',
         });
+
         setIsSheetOpen(true);
-      }
+      });
     });
   };
 
   return (
-    <div className="relative w-full h-screen pb-24">
+    <div className="relative w-full h-screen pb-24 overflow-hidden">
       <Map
         center={center}
         style={{ width: '100%', height: '100%' }}
@@ -81,12 +112,14 @@ const PromiseMap = () => {
             {promise?.title}
           </p>
           <div className="flex">
+            {/* 참여자 인원으로 변경 예정 */}
             {Array.from({ length: promise?.memberCount ?? 1 }).map((_, i) => (
               <img
                 key={i}
                 src={MapMemberIcon}
                 className="w-5 h-5"
                 style={{ marginLeft: i === 0 ? 0 : '-3px' }}
+                alt="참여자"
               />
             ))}
           </div>
