@@ -31,13 +31,13 @@ const CreatePromiseForm = () => {
   const [timeIndex, setTimeIndex] = useState<TimeIndex>(getNowIndex); // 지금 시간을 기본 값으로 설정
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isMultiVote, setIsMultiVote] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const [touched, setTouched] = useState({
+  const [showErrors, setShowErrors] = useState({
     promiseName: false,
     date: false,
     time: false,
-    topic: false,
+    category: false,
   });
 
   const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -51,7 +51,10 @@ const CreatePromiseForm = () => {
   };
 
   const isValid =
-    !!promiseName && !!selectedDate && !!selectedTime && !!selectedTopic;
+    promiseName.trim() !== '' &&
+    !!selectedDate &&
+    !!selectedTime &&
+    !!selectedCategory;
 
   const handleSubmit = () => {
     navigate('/home');
@@ -64,14 +67,14 @@ const CreatePromiseForm = () => {
         <div className="flex flex-col gap-2">
           <CreatePromiseTitle
             title="약속명"
-            error={touched.promiseName && !promiseName}
+            error={showErrors.promiseName && promiseName.trim() === ''}
           />
           <input
             value={promiseName}
             onChange={e => setPromiseName(e.target.value)}
             placeholder="약속명을 입력해 주세요"
             className={`px-3 py-3.75 border rounded-[10px] text-[#111111] placeholder:text-[#C6C6C6] font-Pretendard text-[0.875rem] font-medium leading-5 focus:outline-none ${
-              touched.promiseName && !promiseName
+              showErrors.promiseName && promiseName.trim() === ''
                 ? 'bg-[rgba(255,9,9,0.10)] border-[#FF0909]'
                 : 'bg-[#FAFAFA] border-[#C6C6C6]'
             }`}
@@ -82,19 +85,20 @@ const CreatePromiseForm = () => {
           <CreatePromiseTitle
             title="날짜 · 시간"
             error={
-              (touched.date && !selectedDate) || (touched.time && !selectedTime)
+              (showErrors.date && !selectedDate) ||
+              (showErrors.time && !selectedTime)
             }
           />
           {/* 날짜 선택 드롭다운 */}
           <div className="flex gap-4">
             <div
               onClick={() => {
-                setTouched(prev => ({ ...prev, promiseName: true }));
+                setShowErrors(prev => ({ ...prev, promiseName: true }));
                 setIsTimeOpen(false);
                 setIsDateOpen(!isDateOpen);
               }}
               className={`flex flex-1 justify-between items-center px-2.5 py-3.75 border rounded-[10px] cursor-pointer ${
-                touched.date && !selectedDate
+                showErrors.date && !selectedDate
                   ? 'bg-[rgba(255,9,9,0.10)] border-[#FF0909]'
                   : 'bg-[#FAFAFA] border-[#C6C6C6]'
               }`}
@@ -116,7 +120,7 @@ const CreatePromiseForm = () => {
             {/* 시간 선택 드롭다운 */}
             <div
               onClick={() => {
-                setTouched(prev => ({
+                setShowErrors(prev => ({
                   ...prev,
                   promiseName: true,
                   date: true,
@@ -125,7 +129,7 @@ const CreatePromiseForm = () => {
                 setIsTimeOpen(!isTimeOpen);
               }}
               className={`flex flex-1 justify-between items-center px-2.5 py-3.75 border rounded-[10px] cursor-pointer ${
-                touched.time && !selectedTime
+                showErrors.time && !selectedTime
                   ? 'bg-[rgba(255,9,9,0.10)] border-[#FF0909]'
                   : 'bg-[#FAFAFA] border-[#C6C6C6]'
               }`}
@@ -172,32 +176,38 @@ const CreatePromiseForm = () => {
         <div className="flex flex-col gap-2">
           <CreatePromiseTitle
             title="약속 주제"
-            error={touched.topic && !selectedTopic}
+            error={showErrors.category && !selectedCategory}
           />
           <div className="grid grid-cols-3 gap-2.5">
-            {TOPICS.map(topic => (
+            {TOPICS.map(category => (
               <div
-                key={topic}
+                key={category}
                 onClick={() => {
-                  setTouched(prev => ({
+                  setShowErrors(prev => ({
                     ...prev,
                     promiseName: true,
                     date: true,
                     time: true,
-                    topic: true,
+                    category: true,
                   }));
-                  setSelectedTopic(prev => (prev === topic ? null : topic));
+                  setSelectedCategory(prev =>
+                    prev === category ? null : category,
+                  );
                 }}
                 className={`flex justify-center items-center py-3.75 border border-[#C6C6C6] rounded-[10px] cursor-pointer ${
-                  selectedTopic === topic ? 'bg-[#00408E]' : 'bg-[#FAFAFA] '
+                  selectedCategory === category
+                    ? 'bg-[#00408E]'
+                    : 'bg-[#FAFAFA] '
                 }`}
               >
                 <p
                   className={`text-[0.875rem] font-Pretendard text-[#C6C6C6] leading-5 ${
-                    selectedTopic === topic ? 'font-semibold' : 'font-light'
+                    selectedCategory === category
+                      ? 'font-semibold'
+                      : 'font-light'
                   }`}
                 >
-                  {topic}
+                  {category}
                 </p>
               </div>
             ))}
@@ -208,11 +218,11 @@ const CreatePromiseForm = () => {
           <CreatePromiseTitle title="참여자 초대" />
           <button
             onClick={() => {
-              setTouched({
+              setShowErrors({
                 promiseName: true,
                 date: true,
                 time: true,
-                topic: true,
+                category: true,
               });
             }}
             className="py-1 px-4 border bg-[#FAFAFA] border-[#C6C6C6] rounded-[10px] active:bg-[#00408E]"
@@ -227,11 +237,11 @@ const CreatePromiseForm = () => {
           <CreatePromiseTitle title="장소 복수 투표" />
           <div
             onClick={() => {
-              setTouched({
+              setShowErrors({
                 promiseName: true,
                 date: true,
                 time: true,
-                topic: true,
+                category: true,
               });
               setIsMultiVote(!isMultiVote);
             }}
