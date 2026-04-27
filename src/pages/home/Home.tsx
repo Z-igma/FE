@@ -78,6 +78,9 @@ const Home = () => {
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
+              onClick={() =>
+                navigate(`/map/${promise.id}`, { state: { promise } })
+              }
             />
           ))}
         </div>
@@ -95,6 +98,9 @@ const Home = () => {
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
+              onClick={() =>
+                navigate(`/map/${promise.id}`, { state: { promise } })
+              }
             />
           ))}
         </div>

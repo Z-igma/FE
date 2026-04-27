@@ -9,6 +9,7 @@ import Map from '@/pages/map/Map';
 import NotFound from '@/pages/notFound/NotFound';
 import Promise from '@/pages/promise/Promise';
 import CreatePromiseForm from '@/pages/promise/CreatePromiseForm';
+import PromiseMap from '@/pages/map/PromiseMap';
 
 const router = createBrowserRouter([
   { path: '/', element: <Splash /> },
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
     children: [
       { path: '/home', element: <Home /> },
       { path: '/map', element: <Map /> },
+      { path: '/map/:promiseId', element: <PromiseMap /> },
       {
         element: <ProtectedRoute />,
         children: [

@@ -7,6 +7,7 @@ interface PromiseCardProps {
   title: string;
   date: string;
   memberCount: number;
+  onClick?: () => void;
 }
 
 const STATUS_CONFIG: Record<
@@ -35,12 +36,16 @@ const PromiseCard = ({
   title,
   date,
   memberCount,
+  onClick,
 }: PromiseCardProps) => {
   const config = STATUS_CONFIG[planStatus];
   const isCompleted = planStatus === '확정 완료';
 
   return (
-    <div className="flex flex-col w-full py-4 px-4.25 bg-[#FAFAFA] border border-[#E4E4E4] gap-3 rounded-xl">
+    <div
+      className="flex flex-col w-full py-4 px-4.25 bg-[#FAFAFA] border border-[#E4E4E4] gap-3 rounded-xl"
+      onClick={onClick}
+    >
       <div className="flex flex-col gap-1">
         <div className="flex justify-between items-center">
           <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7">
