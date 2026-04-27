@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import Header from '@/components/layout/Header';
 import SettingIcon from '@/assets/images/account/settingIcon.svg';
 import DefaultProfileIcon from '@assets/images/account/defaultProfileIcon.svg';
-import { useState } from 'react';
+import AccountArrowIcon from '@/assets/images/accountArrowIcon.svg';
+import { useAuthStore } from '@/stores/authStore';
 
 const Account = () => {
+  const { logout } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [bio, setBio] = useState('한 줄 소개를 적어 주세요!');
   const [myPromise, setMyPromise] = useState({
@@ -17,10 +20,23 @@ const Account = () => {
     profileImage: null as string | null,
   });
 
+  const handleLocationPermission = () => {
+    navigator.geolocation.getCurrentPosition(
+      () => {
+        // 허용
+        console.log('위치 권한 허용');
+      },
+      () => {
+        // 거부
+        console.log('위치 권한 거부');
+      },
+    );
+  };
+
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col min-h-screen gap-5">
       <Header title="내 정보" rightIcon={SettingIcon} />
-      <div className="px-4">
+      <div className="flex flex-col flex-1 px-4 justify-between pb-29">
         <div className="flex flex-col bg-[#E2EAF3] p-4 rounded-2xl gap-4">
           <div className="flex justify-between">
             <div className="flex items-center gap-4">
@@ -88,6 +104,26 @@ const Account = () => {
                 {myPromise.created}
               </p>
             </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-5">
+          <div
+            className="flex justify-between px-4 py-2 border border-[#C6C6C6] bg-[#FFFFFF] rounded-[10px]"
+            onClick={handleLocationPermission}
+          >
+            <p className="text-[#000000] font-Pretendard font-light text-[0.75rem] leading-4.2">
+              위치 권한
+            </p>
+            <img src={AccountArrowIcon} />
+          </div>
+          <div
+            className="flex justify-between px-4 py-2 border border-[#C6C6C6] bg-[#FFFFFF] rounded-[10px]"
+            onClick={() => logout()}
+          >
+            <p className="text-[#FF0909] font-Pretendard font-light text-[0.75rem] leading-4.2">
+              로그아웃
+            </p>
+            <img src={AccountArrowIcon} />
           </div>
         </div>
       </div>
