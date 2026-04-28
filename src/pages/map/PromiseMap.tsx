@@ -84,6 +84,11 @@ const PromiseMap = () => {
     _: kakao.maps.Map,
     mouseEvent: kakao.maps.event.MouseEvent,
   ) => {
+    if (isSheetOpen) {
+      setIsSheetOpen(false);
+      return;
+    }
+
     const lat = mouseEvent.latLng.getLat();
     const lng = mouseEvent.latLng.getLng();
 
@@ -225,7 +230,7 @@ const PromiseMap = () => {
       {markers.length > 0 && (
         <VoteBottomSheet
           isOpen={!isSheetOpen}
-          onClose={() => setIsSheetOpen(true)}
+          onClose={() => setIsSheetOpen(false)}
           count={2} // 임시
           promiseId={promiseId}
           promise={promise}

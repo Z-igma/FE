@@ -4,8 +4,8 @@ type BottomSheetProps = {
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  peekHeight?: string; // 닫았을 때 높이
-  fullHeight?: string; // 열었을 때 높이
+  peekHeight?: string;
+  fullHeight?: string;
   className?: string;
 };
 
@@ -20,21 +20,15 @@ const BottomSheet = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleOpen = () => {
-    if (isExpanded) {
-      setIsExpanded(false);
-    } else {
-      setIsExpanded(true);
-    }
+    setIsExpanded(prev => !prev);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bottom-23.5">
-      <div className="absolute inset-0" onClick={onClose} />
-
+    <div className="fixed inset-0 z-50 pointer-events-none">
       <div
-        className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-full bg-white rounded-t-2xl transition-all duration-300 ${
+        className={`absolute bottom-23.5 left-1/2 -translate-x-1/2 w-full bg-white rounded-t-2xl transition-all duration-300 pointer-events-auto ${
           isExpanded ? fullHeight : peekHeight
         } ${!isExpanded ? 'overflow-hidden' : ''}`}
       >
