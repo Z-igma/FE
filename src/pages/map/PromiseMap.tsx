@@ -3,10 +3,12 @@ import { useLocation } from 'react-router-dom';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import LocationBottomSheet from './components/LocationBottomSheet';
 import VoteBottomSheet from './components/VoteBottomSheet';
+import ChatBottomSheet from './components/ChatBottomSheet';
 import ToastMessage from '@/components/common/ToastMessage';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import AddedMarkerIcon from '@/assets/images/map/addedMarkerIcon.svg';
+import ChatIcon from '@/assets/images/map/chatIcon.svg';
 
 const PromiseMap = () => {
   const { state } = useLocation();
@@ -34,6 +36,7 @@ const PromiseMap = () => {
   );
   const [showToast, setShowToast] = useState(true); // 토스트 메시지 연결
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // 위치 허용 시 사용자 위치 기준으로 지도 표시
   useEffect(() => {
@@ -178,6 +181,23 @@ const PromiseMap = () => {
           </div>
         </div>
       </div>
+
+      {/* 댓글 바텀 시트만 구현 + 위치 지정 미구현 */}
+      {!isSheetOpen && (
+        <div
+          className={`absolute right-6 z-50 ${markers.length > 0 ? 'bottom-48' : 'bottom-30'}`}
+          onClick={() => setIsChatOpen(true)}
+        >
+          <div className="flex pl-3 pt-3 pr-3.5 pb-3.5 w-15 h-15 rounded-full bg-[#00408E]">
+            <img src={ChatIcon} />
+          </div>
+        </div>
+      )}
+
+      <ChatBottomSheet
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
 
       {/* 마커 없을 경우 토스트 메시지 */}
       {showToast && isOnline && (
