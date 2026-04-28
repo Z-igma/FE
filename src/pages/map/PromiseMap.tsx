@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import LocationBottomSheet from './components/LocationBottomSheet';
+import VoteBottomSheet from './components/VoteBottomSheet';
+import ToastMessage from '@/components/common/ToastMessage';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import AddedMarkerIcon from '@/assets/images/map/addedMarkerIcon.svg';
-import VoteBottomSheet from './components/VoteBottomSheet';
 
 const PromiseMap = () => {
   const { state } = useLocation();
@@ -31,6 +32,8 @@ const PromiseMap = () => {
   const [selectedMarkerIndex, setSelectedMarkerIndex] = useState<number | null>(
     null,
   );
+  const [showToast, setShowToast] = useState(true); // 토스트 메시지 연결
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   // 위치 허용 시 사용자 위치 기준으로 지도 표시
   useEffect(() => {
@@ -105,6 +108,29 @@ const PromiseMap = () => {
     });
   };
 
+  // 토스트 메시지 관리
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowToast(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 오프라인 여부 확인
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
       <Map
@@ -152,6 +178,28 @@ const PromiseMap = () => {
           </div>
         </div>
       </div>
+
+      {/* 마커 없을 경우 토스트 메시지 */}
+      {showToast && isOnline && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <ToastMessage
+            title="장소가 없어요"
+            subTitle="지도를 눌러 추가해 보세요"
+          />
+        </div>
+      )}
+
+      {/* 오프라인일 경우 토스트 메시지 */}
+      {!isOnline && (
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <ToastMessage
+            title="오프라인 상태입니다"
+            subTitle="장소를 추가할 수 없어요"
+          />
+        </div>
+      )}
+
+      {/* 마커 존재할 경우 기본 바텀 시트 */}
       {markers.length > 0 && (
         <VoteBottomSheet
           isOpen={!isSheetOpen}
@@ -159,6 +207,8 @@ const PromiseMap = () => {
           count={2} // 임시
         />
       )}
+
+      {/* 마커 등록 시 가게 정보 바텀 시트 */}
       {selectedPlace && (
         <LocationBottomSheet
           isOpen={isSheetOpen}
