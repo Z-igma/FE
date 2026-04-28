@@ -5,6 +5,7 @@ import LocationBottomSheet from './components/LocationBottomSheet';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import AddedMarkerIcon from '@/assets/images/map/addedMarkerIcon.svg';
+import VoteBottomSheet from './components/VoteBottomSheet';
 
 const PromiseMap = () => {
   const { state } = useLocation();
@@ -151,6 +152,13 @@ const PromiseMap = () => {
           </div>
         </div>
       </div>
+      {markers.length > 0 && (
+        <VoteBottomSheet
+          isOpen={!isSheetOpen}
+          onClose={() => setIsSheetOpen(true)}
+          count={2} // 임시
+        />
+      )}
       {selectedPlace && (
         <LocationBottomSheet
           isOpen={isSheetOpen}
