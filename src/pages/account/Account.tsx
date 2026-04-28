@@ -108,7 +108,7 @@ const Account = () => {
         </div>
         <div className="flex flex-col gap-5">
           <div
-            className="flex justify-between px-4 py-2 border border-[#C6C6C6] bg-[#FFFFFF] rounded-[10px]"
+            className="flex justify-between items-center px-4 py-2 border border-[#C6C6C6] bg-[#FFFFFF] rounded-[10px]"
             onClick={handleLocationPermission}
           >
             <p className="text-[#000000] font-Pretendard font-light text-[0.75rem] leading-4.2">
@@ -117,7 +117,7 @@ const Account = () => {
             <img src={AccountArrowIcon} />
           </div>
           <div
-            className="flex justify-between px-4 py-2 border border-[#C6C6C6] bg-[#FFFFFF] rounded-[10px]"
+            className="flex justify-between items-center px-4 py-2 border border-[#C6C6C6] bg-[#FFFFFF] rounded-[10px]"
             onClick={() => logout()}
           >
             <p className="text-[#FF0909] font-Pretendard font-light text-[0.75rem] leading-4.2">
