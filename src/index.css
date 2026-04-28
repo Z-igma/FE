@@ -6,6 +6,11 @@
   src: url('/src/assets/fonts/KBLJump_EB_Extended.ttf');
 }
 
+@font-face {
+  font-family: 'SF-Pro';
+  src: url('/src/assets/fonts/SF-Pro.ttf');
+}
+
 @theme {
   --font-pretendard: 'Pretendard Variable', Pretendard, sans-serif;
 
