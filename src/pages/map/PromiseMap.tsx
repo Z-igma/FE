@@ -4,23 +4,27 @@ import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import LocationBottomSheet from './components/LocationBottomSheet';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
+import AddedMarkerIcon from '@/assets/images/map/addedMarkerIcon.svg';
 
 const PromiseMap = () => {
   const { state } = useLocation();
-  const promise = state?.promise;
+  const promise = state?.promise; // 약속 정보
   const [center, setCenter] = useState({ lat: 37.5823688, lng: 127.0111299 });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  // 바텀 시트에 표시될 정보
   const [selectedPlace, setSelectedPlace] = useState<{
     placeName: string;
     address: string;
     proposedBy: string;
   } | null>(null);
+  // 지도에 찍힌 마커 배열
   const [markers, setMarkers] = useState<
     {
       lat: number;
       lng: number;
       placeName: string;
       address: string;
+      isAdded: boolean;
     }[]
   >([]);
   const [selectedMarkerIndex, setSelectedMarkerIndex] = useState<number | null>(
@@ -36,6 +40,8 @@ const PromiseMap = () => {
       });
     });
   }, []);
+
+  if (!promise) return null;
 
   // 클릭한 좌표 주변에서 가장 가까운 가게명 찾기
   const findNearestPlace = (
@@ -74,6 +80,7 @@ const PromiseMap = () => {
 
     const geocoder = new kakao.maps.services.Geocoder();
 
+    // 좌표 > 주소 변환
     geocoder.coord2Address(lng, lat, (result, status) => {
       if (status !== kakao.maps.services.Status.OK) return;
 
@@ -81,8 +88,16 @@ const PromiseMap = () => {
         ? result[0].road_address.address_name
         : result[0].address.address_name;
 
+      // 가게명 조회 > 마커 추가 및 바텀 시트 열기
       findNearestPlace(lat, lng, placeName => {
-        setMarkers(prev => [...prev, { lat, lng, placeName, address }]);
+        setMarkers(prev => {
+          const next = [
+            ...prev,
+            { lat, lng, placeName, address, isAdded: false },
+          ];
+          setSelectedMarkerIndex(next.length - 1);
+          return next;
+        });
         setSelectedPlace({ placeName, address, proposedBy: '나' });
         setIsSheetOpen(true);
       });
@@ -101,8 +116,19 @@ const PromiseMap = () => {
           <MapMarker
             key={i}
             position={{ lat: marker.lat, lng: marker.lng }}
-            image={{ src: CustomMarkerIcon, size: { width: 30, height: 30 } }}
-            onClick={() => setSelectedMarkerIndex(i)}
+            image={{
+              src: marker.isAdded ? AddedMarkerIcon : CustomMarkerIcon,
+              size: { width: 30, height: 30 },
+            }}
+            onClick={() => {
+              setSelectedMarkerIndex(i);
+              setSelectedPlace({
+                placeName: marker.placeName,
+                address: marker.address,
+                proposedBy: '나',
+              });
+              setIsSheetOpen(true);
+            }}
           />
         ))}
       </Map>
@@ -132,6 +158,18 @@ const PromiseMap = () => {
           placeName={selectedPlace.placeName}
           address={selectedPlace.address}
           proposedBy={selectedPlace.proposedBy}
+          isAdded={
+            selectedMarkerIndex !== null
+              ? markers[selectedMarkerIndex].isAdded
+              : false
+          }
+          onToggleAdd={isAdded => {
+            setMarkers(prev =>
+              prev.map((m, i) =>
+                i === selectedMarkerIndex ? { ...m, isAdded } : m,
+              ),
+            );
+          }}
         />
       )}
     </div>

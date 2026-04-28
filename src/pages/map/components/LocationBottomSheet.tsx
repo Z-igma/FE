@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import BottomSheet from '@/components/common/BottomSheet';
 import ProposalMemberIcon from '@/assets/images/map/proposalMemberIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
@@ -10,6 +9,8 @@ interface LocationBottomSheetProps {
   placeName: string;
   address: string;
   proposedBy: string;
+  isAdded: boolean;
+  onToggleAdd: (isAdded: boolean) => void;
 }
 
 const LocationBottomSheet = ({
@@ -18,17 +19,18 @@ const LocationBottomSheet = ({
   placeName,
   address,
   proposedBy,
+  isAdded,
+  onToggleAdd,
 }: LocationBottomSheetProps) => {
-  const [isAdded, setIsAdded] = useState(false);
-
   return (
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
       className="flex flex-col px-4.5 pt-6 gap-15"
       fullHeight="h-45"
+      peekHeight="h-45"
     >
-      <div>
+      <div className="flex flex-col gap-2">
         <div className="flex justify-between">
           <div className="flex flex-col gap-0.5">
             <p className="text-[#111111] font-Pretendard font-semibold text-[1.375rem] leading-7.7">
@@ -43,7 +45,7 @@ const LocationBottomSheet = ({
           </div>
           <div
             className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
-            onClick={() => setIsAdded(prev => !prev)}
+            onClick={() => onToggleAdd(!isAdded)}
           >
             <img
               src={isAdded ? NomineeCheckIcon : PlusIcon}
@@ -52,8 +54,8 @@ const LocationBottomSheet = ({
           </div>
         </div>
         <p className="whitespace-pre-line text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5">
-          {`📍 ${address}`}
-          {/* {`📍 120m  서울 용산구 이태원동 123-45\n⏰ 11:00 - 22:00\n💸 2.5만원대`} */}
+          {`📍 ${address}\n ⏰ \n💸`}
+          {/* {`📍 120m  서울 용산구 이태원동 123-45\n 11:00 - 22:00\n💸 2.5만원대`} */}
         </p>
       </div>
     </BottomSheet>
