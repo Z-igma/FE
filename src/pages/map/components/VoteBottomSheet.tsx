@@ -7,9 +7,15 @@ interface VoteBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
   count: number;
+  promiseId: string | undefined;
 }
 
-const VoteBottomSheet = ({ isOpen, onClose, count }: VoteBottomSheetProps) => {
+const VoteBottomSheet = ({
+  isOpen,
+  onClose,
+  count,
+  promiseId,
+}: VoteBottomSheetProps) => {
   const navigate = useNavigate();
 
   return (
@@ -35,7 +41,7 @@ const VoteBottomSheet = ({ isOpen, onClose, count }: VoteBottomSheetProps) => {
       <BottomButton
         text="장소 결정하기"
         textSize="1rem"
-        onClick={() => navigate('/map/${promise.id}/vote')}
+        onClick={() => navigate(`/map/${promiseId}/vote`)}
       />
     </BottomSheet>
   );

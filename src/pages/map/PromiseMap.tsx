@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Map, MapMarker } from 'react-kakao-maps-sdk';
 import LocationBottomSheet from './components/LocationBottomSheet';
 import VoteBottomSheet from './components/VoteBottomSheet';
@@ -12,7 +12,9 @@ import ChatIcon from '@/assets/images/map/chatIcon.svg';
 
 const PromiseMap = () => {
   const { state } = useLocation();
+  const { promiseId } = useParams();
   const promise = state?.promise; // 약속 정보
+
   const [center, setCenter] = useState({ lat: 37.5823688, lng: 127.0111299 });
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   // 바텀 시트에 표시될 정보
@@ -225,6 +227,7 @@ const PromiseMap = () => {
           isOpen={!isSheetOpen}
           onClose={() => setIsSheetOpen(true)}
           count={2} // 임시
+          promiseId={promiseId}
         />
       )}
 
