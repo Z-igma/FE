@@ -1,6 +1,7 @@
 import CardPeopleIcon from '@/assets/images/home/cardPeopleIcon.svg';
 import CardDetailButtonIcon from '@/assets/images/home/cardDetailButtonIcon.svg';
 import MemberInvitePlusIcon from '@/assets/images/home/memberInvitePlusIcon.svg';
+import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 
 interface PromiseCardProps {
   planStatus: string;
@@ -10,27 +11,6 @@ interface PromiseCardProps {
   onClick?: () => void;
 }
 
-const STATUS_CONFIG: Record<
-  string,
-  { dot: string; badge: string; label: string }
-> = {
-  '장소 미정': {
-    dot: 'bg-[#FFFFFF]',
-    badge: 'bg-[#B2B2B2] text-[#FFFFFF]',
-    label: '장소 미정',
-  },
-  '진행 중': {
-    dot: 'bg-[#2E7D32]',
-    badge: 'bg-[#E8F5E9] text-[#2E7D32]',
-    label: '진행 중',
-  },
-  '확정 완료': {
-    dot: 'bg-[#FFFFFF]',
-    badge: 'bg-[#646464] text-[#FFFFFF]',
-    label: '확정 완료',
-  },
-};
-
 const PromiseCard = ({
   planStatus,
   title,
@@ -38,7 +18,6 @@ const PromiseCard = ({
   memberCount,
   onClick,
 }: PromiseCardProps) => {
-  const config = STATUS_CONFIG[planStatus];
   const isCompleted = planStatus === '확정 완료';
 
   return (
@@ -51,16 +30,7 @@ const PromiseCard = ({
           <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7">
             {title}
           </p>
-          <div
-            className={`flex items-center gap-1.5 py-1.5 px-1.75 rounded-full ${config.badge}`}
-          >
-            {planStatus !== '확정 완료' && (
-              <div className={`w-2.5 h-2.5 rounded-full ${config.dot}`} />
-            )}
-            <p className="font-Pretendard font-semibold text-[0.75rem] leading-4.2">
-              {config.label}
-            </p>
-          </div>
+          <PromiseStatusBadge status={planStatus} />
         </div>
         <p className="text-[#B2B2B2] font-Pretendard font-regular text-[0.875rem] leading-5">
           {date}

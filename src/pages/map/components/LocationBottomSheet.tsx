@@ -1,5 +1,5 @@
 import BottomSheet from '@/components/common/BottomSheet';
-import ProposalMemberIcon from '@/assets/images/map/proposalMemberIcon.svg';
+import MemberIcon from '@/assets/images/memberIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
 import NomineeCheckIcon from '@/assets/images/map/nomineeCheckIcon.svg';
 
@@ -37,7 +37,7 @@ const LocationBottomSheet = ({
               {placeName}
             </p>
             <div className="flex gap-0.5 items-center">
-              <img src={ProposalMemberIcon} />
+              <img src={MemberIcon} />
               <p className="text-[#888888] font-Pretendard font-medium text-[0.75rem] leading-4.2">
                 <span className="font-semibold">{proposedBy}</span> 님이 제안
               </p>

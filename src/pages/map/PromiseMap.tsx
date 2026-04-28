@@ -228,6 +228,7 @@ const PromiseMap = () => {
           onClose={() => setIsSheetOpen(true)}
           count={2} // 임시
           promiseId={promiseId}
+          promise={promise}
         />
       )}
 
