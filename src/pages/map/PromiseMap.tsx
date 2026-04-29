@@ -7,7 +7,6 @@ import ChatBottomSheet from './components/ChatBottomSheet';
 import ToastMessage from '@/components/common/ToastMessage';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
-import AddedMarkerIcon from '@/assets/images/map/addedMarkerIcon.svg';
 import ChatIcon from '@/assets/images/map/chatIcon.svg';
 
 const PromiseMap = () => {
@@ -30,12 +29,14 @@ const PromiseMap = () => {
       lng: number;
       placeName: string;
       address: string;
-      isAdded: boolean;
     }[]
   >([]);
-  const [selectedMarkerIndex, setSelectedMarkerIndex] = useState<number | null>(
-    null,
-  );
+  const [pendingPlace, setPendingPlace] = useState<{
+    lat: number;
+    lng: number;
+    placeName: string;
+    address: string;
+  } | null>(null);
   const [showToast, setShowToast] = useState(true); // 토스트 메시지 연결
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -94,7 +95,6 @@ const PromiseMap = () => {
 
     const geocoder = new kakao.maps.services.Geocoder();
 
-    // 좌표 > 주소 변환
     geocoder.coord2Address(lng, lat, (result, status) => {
       if (status !== kakao.maps.services.Status.OK) return;
 
@@ -102,16 +102,9 @@ const PromiseMap = () => {
         ? result[0].road_address.address_name
         : result[0].address.address_name;
 
-      // 가게명 조회 > 마커 추가 및 바텀 시트 열기
       findNearestPlace(lat, lng, placeName => {
-        setMarkers(prev => {
-          const next = [
-            ...prev,
-            { lat, lng, placeName, address, isAdded: false },
-          ];
-          setSelectedMarkerIndex(next.length - 1);
-          return next;
-        });
+        // 마커 추가 없이 pending 상태만 저장
+        setPendingPlace({ lat, lng, placeName, address });
         setSelectedPlace({ placeName, address, proposedBy: '나' });
         setIsSheetOpen(true);
       });
@@ -154,11 +147,11 @@ const PromiseMap = () => {
             key={i}
             position={{ lat: marker.lat, lng: marker.lng }}
             image={{
-              src: marker.isAdded ? AddedMarkerIcon : CustomMarkerIcon,
+              src: CustomMarkerIcon,
               size: { width: 30, height: 30 },
             }}
             onClick={() => {
-              setSelectedMarkerIndex(i);
+              setPendingPlace(marker);
               setSelectedPlace({
                 placeName: marker.placeName,
                 address: marker.address,
@@ -241,21 +234,48 @@ const PromiseMap = () => {
       {selectedPlace && (
         <LocationBottomSheet
           isOpen={isSheetOpen}
-          onClose={() => setIsSheetOpen(false)}
-          placeName={selectedPlace.placeName}
-          address={selectedPlace.address}
-          proposedBy={selectedPlace.proposedBy}
+          onClose={() => {
+            setIsSheetOpen(false);
+            setPendingPlace(null); // 바텀시트 닫을 때 pending 초기화
+          }}
+          placeName={selectedPlace?.placeName ?? ''}
+          address={selectedPlace?.address ?? ''}
+          proposedBy={selectedPlace?.proposedBy ?? '나'}
           isAdded={
-            selectedMarkerIndex !== null
-              ? markers[selectedMarkerIndex].isAdded
+            pendingPlace
+              ? markers.some(
+                  m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
+                )
               : false
           }
           onToggleAdd={isAdded => {
-            setMarkers(prev =>
-              prev.map((m, i) =>
-                i === selectedMarkerIndex ? { ...m, isAdded } : m,
-              ),
-            );
+            if (!pendingPlace) return;
+            if (isAdded) {
+              // 플러스 눌렀을 때 마커 추가
+              setMarkers(prev => {
+                const alreadyExists = prev.some(
+                  m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
+                );
+                if (alreadyExists) return prev;
+                return [
+                  ...prev,
+                  {
+                    lat: pendingPlace.lat,
+                    lng: pendingPlace.lng,
+                    placeName: pendingPlace.placeName,
+                    address: pendingPlace.address,
+                  },
+                ];
+              });
+            } else {
+              // 체크 상태에서 다시 누르면 마커 제거
+              setMarkers(prev =>
+                prev.filter(
+                  m =>
+                    !(m.lat === pendingPlace.lat && m.lng === pendingPlace.lng),
+                ),
+              );
+            }
           }}
         />
       )}
