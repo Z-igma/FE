@@ -1,4 +1,4 @@
-import CardPeopleIcon from '@/assets/images/home/cardPeopleIcon.svg';
+import CardMemberIcon from '@/assets/images/cardMemberIcon.svg';
 import CardDetailButtonIcon from '@/assets/images/home/cardDetailButtonIcon.svg';
 import MemberInvitePlusIcon from '@/assets/images/home/memberInvitePlusIcon.svg';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
@@ -48,7 +48,7 @@ const PromiseCard = ({
         ) : (
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-1.25">
-              <img src={CardPeopleIcon} />
+              <img src={CardMemberIcon} />
               <p className="text-[#111111] font-Pretendard font-regular text-[0.875rem] leading-5">
                 {memberCount}명
               </p>
