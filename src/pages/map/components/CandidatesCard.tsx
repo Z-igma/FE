@@ -1,7 +1,9 @@
 import CardMemberIcon from '@/assets/images/cardMemberIcon.svg';
 
+type CardStatus = 'best' | 'tie' | null;
+
 interface CandidatesCardProps {
-  isBest: boolean;
+  status: CardStatus;
   name: string;
   distance: number;
   address: string;
@@ -12,7 +14,7 @@ interface CandidatesCardProps {
 }
 
 const CandidatesCard = ({
-  isBest,
+  status,
   name,
   distance,
   address,
@@ -23,8 +25,10 @@ const CandidatesCard = ({
 }: CandidatesCardProps) => {
   return (
     <div
-      className={`flex flex-col gap-1.5 pt-4.5 pb-5.5 px-5 rounded-2xl ${
-        isBest ? 'bg-[rgba(0,64,142,0.06)]' : 'bg-white border border-[#C6C6C6]'
+      className={`flex flex-col gap-1.5 pt-4.5 pb-5.5 px-5  rounded-2xl ${
+        status === 'tie'
+          ? 'bg-[rgba(255,152,0,0.10)] border-[rgba(255,152,0,0.10)]'
+          : 'border-[#C6C6C6]'
       }`}
     >
       <div className="flex justify-between items-start">
@@ -36,22 +40,35 @@ const CandidatesCard = ({
             📍 {distance}m {address}
           </p>
         </div>
-        {isBest && (
+        {status === 'best' && (
           <div className="bg-[#E8F5E9] px-4 py-1.5 rounded-full">
             <p className="text-[#2E7D32] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               👑 1위
             </p>
           </div>
         )}
+        {status === 'tie' && (
+          <div className="bg-[#FF9800] px-4 py-1.5 rounded-full">
+            <p className="text-[#FFFFFF] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
+              동점
+            </p>
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-3.5">
         <div className="flex flex-col items-end gap-4">
-          <p className="text-[#00408E] font-Pretendard font-bold text-[1.25rem] leading-7">
+          <p
+            className={`font-Pretendard font-bold text-[1.25rem] leading-7 ${
+              status === 'tie' ? 'text-[#FFB240]' : 'text-[#00408E]'
+            }`}
+          >
             {voteCount} / {memberCount} 표
           </p>
           <div className="w-full h-1.5 bg-[#DDDDDD] rounded-full">
             <div
-              className="h-1.5 bg-[#00408E] rounded-full"
+              className={`h-1.5 rounded-full ${
+                status === 'tie' ? 'bg-[#FFB240]' : 'bg-[#00408E]'
+              }`}
               style={{
                 width: `${memberCount > 0 ? (voteCount / memberCount) * 100 : 0}%`,
               }}

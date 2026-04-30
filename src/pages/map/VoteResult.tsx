@@ -6,6 +6,8 @@ import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 import CandidatesCard from './components/CandidatesCard';
 
 const VoteResult = () => {
+  // 약속 생성자 구분 추가 예정
+
   const { state } = useLocation();
   const promise = state?.promise; // 약속 정보
 
@@ -24,10 +26,10 @@ const VoteResult = () => {
       id: 2,
       name: '스시 오마카세',
       distance: 340,
-      address: '서울 서대문구 신촌',
+      address: '서울 강남 서초동 123-45',
       createMember: '지민',
       voteMember: '현준 예준',
-      voteCount: 1,
+      voteCount: 3,
       isBest: false,
     },
     {
@@ -36,11 +38,24 @@ const VoteResult = () => {
       distance: 340,
       address: '서울 홍대 입구역',
       createMember: '지민',
-      voteMember: '님이 투표',
+      voteMember: '',
       voteCount: 1,
       isBest: false,
     },
   ];
+
+  const totalVotes = candidates.reduce((sum, c) => sum + c.voteCount, 0);
+  const hasVote = totalVotes > 0;
+
+  const maxVote = Math.max(...candidates.map(c => c.voteCount));
+  const topCandidates = candidates.filter(c => c.voteCount === maxVote);
+  const isTie = topCandidates.length > 1;
+
+  const getStatus = (voteCount: number): 'best' | 'tie' | null => {
+    if (voteCount !== maxVote) return null;
+    if (isTie) return 'tie';
+    return 'best';
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -62,14 +77,14 @@ const VoteResult = () => {
             <PromiseStatusBadge status={promise.planStatus} />
           </div>
           <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
-            <BottomButton text="장소 확정하기" />
+            <BottomButton text="장소 확정하기" disabled={!hasVote} />
           </div>
         </div>
         <div className="flex flex-col overflow-y-auto max-h-[calc(100vh-260px)] px-4 gap-5 pb-20">
           {candidates.map(candidate => (
             <CandidatesCard
               key={candidate.id}
-              isBest={candidate.isBest}
+              status={getStatus(candidate.voteCount)}
               name={candidate.name}
               distance={candidate.distance}
               address={candidate.address}
