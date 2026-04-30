@@ -25,7 +25,7 @@ const VoteStateBox = ({
           <p
             className={`${isBest ? 'text-[#111111]' : 'text-[#888888]'} font-Pretendard font-regular text-[1rem] leading-5.6`}
           >
-            {distance}
+            {distance}m
           </p>
         </div>
         <p

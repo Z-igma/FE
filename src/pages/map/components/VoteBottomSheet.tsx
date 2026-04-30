@@ -19,6 +19,16 @@ const VoteBottomSheet = ({
   promise,
 }: VoteBottomSheetProps) => {
   const navigate = useNavigate();
+  const candidates = [
+    {
+      id: 1,
+      name: '이태원 파스타 집',
+      distance: '120',
+      vote: 4,
+      isBest: true,
+    },
+    { id: 2, name: '스시 오마카세', distance: '340', vote: 1, isBest: false },
+  ];
 
   return (
     <BottomSheet
@@ -32,12 +42,15 @@ const VoteBottomSheet = ({
       </p>
       <div className="flex flex-col overflow-y-auto min-h-45 max-h-45 gap-2.5">
         {/* 투표 내용 임시 */}
-        <VoteStateBox
-          isBest={true}
-          name="이태원 파스타 집"
-          distance="120m"
-          vote={4}
-        />
+        {candidates.map(candidate => (
+          <VoteStateBox
+            key={candidate.id}
+            isBest={candidate.isBest}
+            name={candidate.name}
+            distance={candidate.distance}
+            vote={candidate.vote}
+          />
+        ))}
         <VoteStateBox name="이태원 파스타 집" distance="120m" vote={1} />
       </div>
       <BottomButton
