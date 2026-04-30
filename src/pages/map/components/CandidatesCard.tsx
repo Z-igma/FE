@@ -3,6 +3,9 @@ import CardMemberIcon from '@/assets/images/cardMemberIcon.svg';
 type CardStatus = 'best' | 'tie' | null;
 
 interface CandidatesCardProps {
+  isSelectable?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
   status: CardStatus;
   name: string;
   distance: number;
@@ -14,6 +17,9 @@ interface CandidatesCardProps {
 }
 
 const CandidatesCard = ({
+  isSelectable,
+  isSelected,
+  onSelect,
   status,
   name,
   distance,
@@ -25,11 +31,18 @@ const CandidatesCard = ({
 }: CandidatesCardProps) => {
   return (
     <div
-      className={`flex flex-col gap-1.5 pt-4.5 pb-5.5 px-5  rounded-2xl ${
-        status === 'tie'
-          ? 'bg-[rgba(255,152,0,0.10)] border-[rgba(255,152,0,0.10)]'
-          : 'border-[#C6C6C6]'
-      }`}
+      className={`flex flex-col gap-1.5 pt-4.5 pb-5.5 px-5 border rounded-2xl ${
+        isSelectable && isSelected
+          ? 'bg-[rgba(255,152,0,0.10)] border-[#FF9800]'
+          : isSelectable
+            ? 'bg-[#FFFFFF] border-[#C6C6C6]'
+            : status === 'best'
+              ? 'bg-[rgba(0,64,142,0.06)] border-[#00408E]'
+              : status === 'tie'
+                ? 'bg-[rgba(255,152,0,0.10)] border-[rgba(255,152,0,0.50)]'
+                : 'border-[#C6C6C6]'
+      } ${isSelectable ? 'cursor-pointer' : ''}`}
+      onClick={isSelectable ? onSelect : undefined}
     >
       <div className="flex justify-between items-start">
         <div className="flex flex-col gap-1">
