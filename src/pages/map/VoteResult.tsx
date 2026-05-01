@@ -1,17 +1,13 @@
-import { useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import CandidatesCard from './components/CandidatesCard';
+import ConfirmModal from './components/ConfirmModal';
 import BottomButton from '@/components/common/BottomButton';
 import Header from '@/components/layout/Header';
-import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
-import CandidatesCard from './components/CandidatesCard';
-import { useState } from 'react';
+import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
 
 const VoteResult = () => {
-  // 약속 생성자 구분 추가 예정
-
-  const { state } = useLocation();
-  const promise = state?.promise; // 약속 정보
-
   const candidates = [
     {
       id: 1,
@@ -42,57 +38,55 @@ const VoteResult = () => {
     },
   ];
 
-  // 모든 후보 장소의 총 투표 수를 계산 후 버튼 활성화 여부
-  const totalVotes = candidates.reduce((sum, c) => sum + c.voteCount, 0);
-  const hasVote = totalVotes > 0;
-  const maxVote = Math.max(...candidates.map(c => c.voteCount));
+  const isCreator = true; // 약속 생성자 구분 추가 예정
 
-  // 최다 득표 수 판단
-  const topCandidates = candidates.filter(c => c.voteCount === maxVote);
-  const isTie = topCandidates.length > 1;
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const promise = state?.promise;
 
-  // 각 약속별 투표 상태
+  // 투표 결과 계산
+  const hasVote = candidates.some(c => c.voteCount > 0); // 투표가 하나라도 있는지
+  const maxVote = Math.max(...candidates.map(c => c.voteCount)); // 최다 득표 수
+  const topCandidates = candidates.filter(c => c.voteCount === maxVote); // 최다 득표 후보지 목록
+  const isTie = topCandidates.length > 1; // 동점 여부
+
+  // 득표 수에 따른 카드 상태 반환
   const getStatus = (voteCount: number): 'best' | 'tie' | null => {
     if (voteCount !== maxVote) return null;
-    if (isTie) return 'tie';
-    return 'best';
+    return isTie ? 'tie' : 'best';
   };
 
-  const isCreator = true; // 확정 가능 여부 분기 위한 생성자 여부 임시 판단
-  const [isRevote, setIsRevote] = useState(false); // 재투표 상태
+  const [isRevote, setIsRevote] = useState(false); // 재투표 진행 여부
+  const isRevoteTie = false; // 재투표 후 동점 여부
+  const [myVote, setMyVote] = useState<number | null>(null); // 방장이 선택한 후보지
 
-  // 재투표 후보지
-  const revoteCandidates = candidates.filter(c => c.voteCount === maxVote);
-  const displayCandidates = isRevote ? revoteCandidates : candidates;
+  // 재투표 시 동점 후보지만 표시, 아니면 전체 표시
+  const displayCandidates = isRevote
+    ? candidates.filter(c => c.voteCount === maxVote)
+    : candidates;
 
-  const isRevoteTie = false; // 재투표 후 또 동점 여부
-  const [myVote, setMyVote] = useState<number | null>(null);
-  const [pickedId, setPickedId] = useState<number | null>(null); // 방장이 선택한 후보지
+  // 현재 상태에 따른 버튼 텍스트
+  const buttonText = isRevoteTie
+    ? '임의로 장소 확정하기' // 재투표 후 또 동점 시 방장이 임의 확정
+    : isRevote
+      ? '장소 확정하기' // 재투표 중
+      : isTie
+        ? '다시 투표하기' // 첫 투표 동점
+        : '장소 결정하기'; // 일반
 
-  const isSelectable = isRevote || (isRevoteTie && isCreator);
+  // 재투표 중엔 후보지 선택을 하면 항상 활성화지만 디폴트는 투표를 시작하면 활성화
+  const buttonDisabled = isRevote ? myVote === null : !hasVote;
 
-  const getCardStatus = (candidate: (typeof candidates)[0]) => {
-    return getStatus(candidate.voteCount);
-  };
-
-  const buttonText = isRevote
-    ? '투표하기'
-    : isTie && !isRevoteTie
-      ? '다시 투표하기'
-      : '장소 확정하기';
-
-  // 버튼 비활성화 조건
-  const buttonDisabled = isRevote
-    ? myVote === null
-    : isRevoteTie
-      ? pickedId === null
-      : !hasVote;
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [confirmedCandidate, setConfirmedCandidate] = useState<
+    (typeof candidates)[0] | null
+  >(null); // 확정 모달에 넘길 후보지
 
   return (
     <div className="flex flex-col gap-3">
       <Header title="장소 결정" />
       <div className="flex flex-col gap-5">
-        <div className="flex justify-between px-4 ">
+        <div className="flex justify-between px-4">
           <div className="flex flex-col gap-1">
             <p className="text-[#111111] font-Pretendard font-semibold text-[1.5rem] leading-8.4">
               {promise.title}
@@ -108,32 +102,37 @@ const VoteResult = () => {
             <PromiseStatusBadge status={promise.planStatus} />
           </div>
 
-          {(isCreator || isRevote) && (
+          {isCreator && (
             <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
               <BottomButton
                 text={buttonText}
                 disabled={buttonDisabled}
                 onClick={() => {
                   if (isTie && !isRevote && !isRevoteTie) {
-                    setIsRevote(true); // 재투표 시작
+                    // 동점이면 재투표 시작
+                    setIsRevote(true);
+                  } else {
+                    // 확정 모달 오픈
+                    const target = myVote
+                      ? candidates.find(c => c.id === myVote)
+                      : topCandidates[0];
+                    setConfirmedCandidate(target ?? null);
+                    setIsConfirmModalOpen(true);
                   }
                 }}
               />
             </div>
           )}
         </div>
+
         <div className="flex flex-col overflow-y-auto max-h-[calc(100vh-260px)] px-4 gap-5 pb-20">
           {displayCandidates.map(candidate => (
             <CandidatesCard
-              status={getCardStatus(candidate)}
-              isSelectable={isSelectable}
-              isSelected={
-                isRevote ? myVote === candidate.id : pickedId === candidate.id
-              }
-              onSelect={() => {
-                if (isRevote) setMyVote(candidate.id);
-                else if (isRevoteTie && isCreator) setPickedId(candidate.id);
-              }}
+              key={candidate.id}
+              status={getStatus(candidate.voteCount)}
+              isSelectable={isCreator}
+              isSelected={myVote === candidate.id}
+              onSelect={() => setMyVote(candidate.id)}
               name={candidate.name}
               distance={candidate.distance}
               address={candidate.address}
@@ -145,6 +144,22 @@ const VoteResult = () => {
           ))}
         </div>
       </div>
+
+      {/* 확정 모달 */}
+      {isConfirmModalOpen && confirmedCandidate && (
+        <div className="fixed inset-0 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50">
+          <ConfirmModal
+            name={confirmedCandidate.name}
+            onConfirm={() => {
+              setIsConfirmModalOpen(false);
+              navigate(`/map/${promise.id}/confirmed`, {
+                state: { promise, confirmedCandidate },
+              });
+            }}
+            onClose={() => setIsConfirmModalOpen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
