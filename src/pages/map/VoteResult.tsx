@@ -149,7 +149,9 @@ const VoteResult = () => {
       {isConfirmModalOpen && confirmedCandidate && (
         <div className="fixed inset-0 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50">
           <ConfirmModal
-            name={confirmedCandidate.name}
+            questionText="이 장소를 확정할까요?"
+            mainText={confirmedCandidate.name}
+            subText="확정 시 모든 멤버에게 알림이 전송됩니다"
             onConfirm={() => {
               setIsConfirmModalOpen(false);
               navigate(`/map/${promise.id}/confirmed`, {
@@ -157,6 +159,9 @@ const VoteResult = () => {
               });
             }}
             onClose={() => setIsConfirmModalOpen(false)}
+            confirmText="확정하기"
+            closeText="취소"
+            icon={true}
           />
         </div>
       )}
