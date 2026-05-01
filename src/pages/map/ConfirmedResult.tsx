@@ -11,21 +11,46 @@ const ConfirmedResult = () => {
   const candidate = state?.confirmedCandidate;
 
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+  const today =
+    new Date().toDateString() === new Date(promise.date).toDateString();
+
+  console.log(new Date().toDateString());
+  console.log(new Date(promise.promisedAt).toDateString());
+  console.log(today);
 
   return (
     <div className="flex flex-col gap-3">
       <Header title="일정 확정" />
       <div className="flex flex-col gap-5">
-        <div className="flex justify-between px-4">
-          <div className="flex flex-col gap-1">
-            <p className="text-[#111111] font-Pretendard font-semibold text-[1.5rem] leading-8.4">
-              {promise.title}
-            </p>
+        {!today ? (
+          <div className="flex justify-between px-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-[#111111] font-Pretendard font-semibold text-[1.5rem] leading-8.4">
+                {promise.title}
+              </p>
+            </div>
+            <div>
+              <PromiseStatusBadge status="확정 완료" />
+            </div>
           </div>
-          <div>
-            <PromiseStatusBadge status="확정 완료" />
+        ) : (
+          <div className="px-4">
+            <div className="flex justify-between py-4 px-5 bg-[#00408E] rounded-xl">
+              <p className="text-[#FFFFFF] font-Pretendard font-semibold text-[1.25rem] leading-5">
+                오늘의 약속
+              </p>
+              <div className="flex flex-col items-end gap-1">
+                <p className="text-[#FFFFFF] font-Pretendard font-regular text-[1rem] leading-4">
+                  {promise.dayOfWeek}요일 {promise.title}
+                </p>
+                <p className="text-[#FFFFFF] font-Pretendard font-regular text-[1rem] leading-4">
+                  19:00
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
+
         <div className="px-4">
           <CandidatesCard
             status="best"
