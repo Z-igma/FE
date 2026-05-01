@@ -1,7 +1,7 @@
 import BottomButton from '@/components/common/BottomButton';
 import VoteConfirmModalIcon from '@/assets/images/voteConfirmModalIcon.svg';
 
-interface ConfirmModalProps {
+interface CommonModalProps {
   questionText?: string;
   mainText: string;
   subText: string;
@@ -10,9 +10,10 @@ interface ConfirmModalProps {
   icon?: boolean;
   onConfirm: () => void;
   onClose: () => void;
+  mainTextSize?: string;
 }
 
-const ConfirmModal = ({
+const CommonModal = ({
   questionText,
   mainText,
   subText,
@@ -21,7 +22,8 @@ const ConfirmModal = ({
   icon,
   onConfirm,
   onClose,
-}: ConfirmModalProps) => {
+  mainTextSize = 'text-[1.75rem]',
+}: CommonModalProps) => {
   return (
     <div className="flex flex-col text-center w-81 gap-4.5 bg-[#FFFFFF] rounded-2xl py-7.5 px-4.5">
       <div className="flex flex-col gap-0.5">
@@ -31,7 +33,9 @@ const ConfirmModal = ({
               {questionText}
             </p>
           )}
-          <p className="text-[#111111] font-Pretendard font-semibold text-[1.75rem] leading-11.2">
+          <p
+            className={`text-[#111111] font-Pretendard font-semibold ${mainTextSize} leading-11.2`}
+          >
             {mainText}
           </p>
         </div>
@@ -59,4 +63,4 @@ const ConfirmModal = ({
   );
 };
 
-export default ConfirmModal;
+export default CommonModal;

@@ -14,6 +14,7 @@ interface CandidatesCardProps {
   voteMember: string; // 투표한 멤버
   voteCount: number; // 득표 수
   memberCount: number; // 전체 멤버 수
+  hideBadge?: boolean;
 }
 
 const CandidatesCard = ({
@@ -28,6 +29,7 @@ const CandidatesCard = ({
   voteMember,
   voteCount,
   memberCount,
+  hideBadge,
 }: CandidatesCardProps) => {
   return (
     <div
@@ -54,7 +56,7 @@ const CandidatesCard = ({
         </div>
 
         {/* 1위 */}
-        {status === 'best' && (
+        {status === 'best' && !hideBadge && (
           <div className="bg-[#E8F5E9] px-4 py-1.5 rounded-full">
             <p className="text-[#2E7D32] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               👑 1위
@@ -63,7 +65,7 @@ const CandidatesCard = ({
         )}
 
         {/* 동점 */}
-        {status === 'tie' && (
+        {status === 'tie' && !hideBadge && (
           <div className="bg-[#FF9800] px-4 py-1.5 rounded-full">
             <p className="text-[#FFFFFF] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               동점

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CandidatesCard from './components/CandidatesCard';
-import ConfirmModal from './components/ConfirmModal';
+import CommonModal from '@/components/modal/CommonModal';
 import BottomButton from '@/components/common/BottomButton';
 import Header from '@/components/layout/Header';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
@@ -148,7 +148,7 @@ const VoteResult = () => {
       {/* 확정 모달 */}
       {isConfirmModalOpen && confirmedCandidate && (
         <div className="fixed inset-0 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50">
-          <ConfirmModal
+          <CommonModal
             questionText="이 장소를 확정할까요?"
             mainText={confirmedCandidate.name}
             subText="확정 시 모든 멤버에게 알림이 전송됩니다"
