@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Map, MapMarker } from 'react-kakao-maps-sdk';
+import { Map, MapMarker, MarkerClusterer } from 'react-kakao-maps-sdk';
 import LocationBottomSheet from './components/LocationBottomSheet';
 import VoteBottomSheet from './components/VoteBottomSheet';
 import ChatBottomSheet from './components/ChatBottomSheet';
@@ -214,22 +214,41 @@ const PromiseMap = () => {
         style={{ width: '100%', height: '100%' }}
         onClick={handleMapClick}
       >
-        {markers.map((marker, i) => (
-          <MapMarker
-            key={i}
-            position={{ lat: marker.lat, lng: marker.lng }}
-            image={{ src: CustomMarkerIcon, size: { width: 30, height: 30 } }}
-            onClick={() => {
-              setPendingPlace(marker);
-              setSelectedPlace({
-                placeName: marker.placeName,
-                address: marker.address,
-                proposedBy: '나',
-              });
-              setIsSheetOpen(true);
-            }}
-          />
-        ))}
+        <MarkerClusterer
+          averageCenter={true}
+          minLevel={5}
+          styles={[
+            {
+              width: '2.5rem',
+              height: '2.5rem',
+              background: '#00408E',
+              borderRadius: '50%',
+              color: '#FFFFFF',
+              fontFamily: 'Pretendard',
+              fontWeight: '600',
+              fontSize: '0.875rem',
+              lineHeight: '2.5rem',
+              textAlign: 'center',
+            },
+          ]}
+        >
+          {markers.map((marker, i) => (
+            <MapMarker
+              key={i}
+              position={{ lat: marker.lat, lng: marker.lng }}
+              image={{ src: CustomMarkerIcon, size: { width: 30, height: 30 } }}
+              onClick={() => {
+                setPendingPlace(marker);
+                setSelectedPlace({
+                  placeName: marker.placeName,
+                  address: marker.address,
+                  proposedBy: '나',
+                });
+                setIsSheetOpen(true);
+              }}
+            />
+          ))}
+        </MarkerClusterer>
       </Map>
 
       {/* 약속 정보 카드 */}
