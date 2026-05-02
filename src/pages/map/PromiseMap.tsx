@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Map, MapMarker, MarkerClusterer } from 'react-kakao-maps-sdk';
+import {
+  CustomOverlayMap,
+  Map,
+  MapMarker,
+  MarkerClusterer,
+} from 'react-kakao-maps-sdk';
 import LocationBottomSheet from './components/LocationBottomSheet';
 import VoteBottomSheet from './components/VoteBottomSheet';
 import ChatBottomSheet from './components/ChatBottomSheet';
@@ -8,6 +13,7 @@ import ToastMessage from '@/components/common/ToastMessage';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import ChatIcon from '@/assets/images/map/chatIcon.svg';
+import LocationMarker from './components/LocationMarker';
 
 const CATEGORIES = [
   'FD6', // 음식점
@@ -53,6 +59,8 @@ const PromiseMap = () => {
 
   const [showToast, setShowToast] = useState(true); // 토스트 메시지 관리
   const [isOnline, setIsOnline] = useState(navigator.onLine); // 네트워크 상태
+
+  const [selectedOverlay, setSelectedOverlay] = useState<Marker | null>(null);
 
   // 사용자 위치를 중심으로 설정
   useEffect(() => {
@@ -129,6 +137,7 @@ const PromiseMap = () => {
     _: kakao.maps.Map,
     mouseEvent: kakao.maps.event.MouseEvent,
   ) => {
+    setSelectedOverlay(null); // 추가
     if (isSheetOpen) {
       setIsSheetOpen(false);
       return;
@@ -207,7 +216,7 @@ const PromiseMap = () => {
       : votedPlace === placeKey(pendingPlace.lat, pendingPlace.lng)
     : false;
 
-  const isConfirmed = true;
+  const isConfirmed = false;
 
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
@@ -235,20 +244,48 @@ const PromiseMap = () => {
           ]}
         >
           {markers.map((marker, i) => (
-            <MapMarker
-              key={i}
-              position={{ lat: marker.lat, lng: marker.lng }}
-              image={{ src: CustomMarkerIcon, size: { width: 30, height: 30 } }}
-              onClick={() => {
-                setPendingPlace(marker);
-                setSelectedPlace({
-                  placeName: marker.placeName,
-                  address: marker.address,
-                  proposedBy: '나',
-                });
-                setIsSheetOpen(true);
-              }}
-            />
+            <>
+              {/* 선택된 마커는 숨김 */}
+              {!(
+                selectedOverlay?.lat === marker.lat &&
+                selectedOverlay?.lng === marker.lng
+              ) && (
+                <MapMarker
+                  key={`marker-${i}`}
+                  position={{ lat: marker.lat, lng: marker.lng }}
+                  image={{
+                    src: CustomMarkerIcon,
+                    size: { width: 30, height: 30 },
+                  }}
+                  onClick={() => setSelectedOverlay(marker)}
+                />
+              )}
+
+              {/* 선택된 마커 위치에 말풍선 표시 */}
+              {selectedOverlay?.lat === marker.lat &&
+                selectedOverlay?.lng === marker.lng && (
+                  <CustomOverlayMap
+                    key={`overlay-${i}`}
+                    position={{ lat: marker.lat, lng: marker.lng }}
+                    yAnchor={1}
+                    xAnchor={0}
+                  >
+                    <LocationMarker
+                      name={marker.placeName}
+                      onClick={() => {
+                        setPendingPlace(marker);
+                        setSelectedPlace({
+                          placeName: marker.placeName,
+                          address: marker.address,
+                          proposedBy: '나',
+                        });
+                        setIsSheetOpen(true);
+                        setSelectedOverlay(null);
+                      }}
+                    />
+                  </CustomOverlayMap>
+                )}
+            </>
           ))}
         </MarkerClusterer>
       </Map>
