@@ -51,7 +51,7 @@ const BottomNavBar = () => {
   };
 
   return (
-    <nav className="flex justify-between items-center fixed bottom-5 w-full max-w-[393px] px-9.5 py-3.75 bg-[#FFFFFF] shadow-[0_4px_20px_0_rgba(17,17,17,0.04)] rounded-t-[20px] left-1/2 -translate-x-1/2">
+    <nav className="flex justify-between items-center fixed bottom-1 w-full max-w-[393px] px-9.5 py-3.75 bg-[#FFFFFF] shadow-[0_4px_20px_0_rgba(17,17,17,0.04)] rounded-t-[20px] left-1/2 -translate-x-1/2">
       {tabs.map(({ path, label, defaultIcon, activeIcon }) => (
         <button
           key={path}

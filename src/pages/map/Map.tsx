@@ -53,6 +53,8 @@ const Map = () => {
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           className="flex flex-col px-5 pt-12 gap-15"
+          peekHeight="h-90"
+          fullHeight="h-90"
         >
           <div className="flex flex-col items-center text-center">
             <img src={WarningIcon} />
@@ -77,6 +79,8 @@ const Map = () => {
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           className="flex flex-col px-5 pt-12 gap-15"
+          peekHeight="h-90"
+          fullHeight="h-90"
         >
           <div className="flex flex-col items-center text-center">
             <img src={WarningIcon} />
