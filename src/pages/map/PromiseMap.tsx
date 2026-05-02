@@ -207,6 +207,8 @@ const PromiseMap = () => {
       : votedPlace === placeKey(pendingPlace.lat, pendingPlace.lng)
     : false;
 
+  const isConfirmed = true;
+
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
       <Map
@@ -331,6 +333,7 @@ const PromiseMap = () => {
           onToggleAdd={handleToggleAdd}
           isVoted={isVoted}
           onToggleVote={handleToggleVote}
+          isConfirmed={isConfirmed}
         />
       )}
     </div>
