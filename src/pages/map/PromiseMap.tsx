@@ -9,39 +9,46 @@ import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import ChatIcon from '@/assets/images/map/chatIcon.svg';
 
+const CATEGORIES = [
+  'FD6', // 음식점
+  'CE7', // 카페
+  'CT1', // 문화 시설
+  'AT4', // 관광 명소
+];
+
+interface Marker {
+  lat: number;
+  lng: number;
+  placeName: string;
+  address: string;
+}
+
+interface SelectedPlace {
+  placeName: string;
+  address: string;
+  proposedBy: string;
+}
+
 const PromiseMap = () => {
   const { state } = useLocation();
   const { promiseId } = useParams();
-  const promise = state?.promise; // 약속 정보
+  const promise = state?.promise;
 
   const [center, setCenter] = useState({ lat: 37.5823688, lng: 127.0111299 });
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  // 바텀 시트에 표시될 정보
-  const [selectedPlace, setSelectedPlace] = useState<{
-    placeName: string;
-    address: string;
-    proposedBy: string;
-  } | null>(null);
-  // 지도에 찍힌 마커 배열
-  const [markers, setMarkers] = useState<
-    {
-      lat: number;
-      lng: number;
-      placeName: string;
-      address: string;
-    }[]
-  >([]);
-  const [pendingPlace, setPendingPlace] = useState<{
-    lat: number;
-    lng: number;
-    placeName: string;
-    address: string;
-  } | null>(null);
-  const [showToast, setShowToast] = useState(true); // 토스트 메시지 연결
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // 위치 허용 시 사용자 위치 기준으로 지도 표시
+  // 바텀 시트 관리
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>( // 선택된 장소 정보
+    null,
+  );
+  const [markers, setMarkers] = useState<Marker[]>([]); // 등록된 마커
+  const [pendingPlace, setPendingPlace] = useState<Marker | null>(null);
+  const [isVoted, setIsVoted] = useState(false); // 투표 상태 관리
+  const [showToast, setShowToast] = useState(true); // 토스트 메시지 관리
+  const [isOnline, setIsOnline] = useState(navigator.onLine); // 네트워크 상태
+
+  // 사용자 위치를 중심으로 설정
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(position => {
       setCenter({
@@ -51,9 +58,27 @@ const PromiseMap = () => {
     });
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setShowToast(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 온오프라인 감지
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   if (!promise) return null;
 
-  // 클릭한 좌표 주변에서 가장 가까운 가게명 찾기
+  // 클릭 좌표 내 음식점 조회
   const findNearestPlace = (
     lat: number,
     lng: number,
@@ -62,25 +87,36 @@ const PromiseMap = () => {
     const places = new kakao.maps.services.Places();
     const location = new kakao.maps.LatLng(lat, lng);
 
-    places.categorySearch(
-      'FD6', // 음식점 카테고리
-      (result, status) => {
-        if (status === kakao.maps.services.Status.OK && result.length > 0) {
-          callback(result[0].place_name);
-          return;
-        }
+    const results: kakao.maps.services.PlacesSearchResult = [];
 
-        callback('선택한 위치');
-      },
-      {
-        location,
-        radius: 50,
-        sort: kakao.maps.services.SortBy.DISTANCE,
-      },
-    );
+    let completed = 0;
+
+    CATEGORIES.forEach(category => {
+      places.categorySearch(
+        category as any,
+        (result, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            results.push(...result);
+          }
+          completed++;
+
+          // 모든 카테고리 조회 완료 시
+          if (completed === CATEGORIES.length) {
+            if (results.length === 0) {
+              callback('선택한 위치');
+              return;
+            }
+
+            // 거리순 정렬 후 가장 가까운 장소 반환
+            results.sort((a, b) => Number(a.distance) - Number(b.distance));
+            callback(results[0].place_name);
+          }
+        },
+        { location, radius: 50, sort: kakao.maps.services.SortBy.DISTANCE },
+      );
+    });
   };
 
-  // 지도 클릭 시 마커 추가 + 주소 조회 + 주변 가게명 조회
   const handleMapClick = (
     _: kakao.maps.Map,
     mouseEvent: kakao.maps.event.MouseEvent,
@@ -92,18 +128,15 @@ const PromiseMap = () => {
 
     const lat = mouseEvent.latLng.getLat();
     const lng = mouseEvent.latLng.getLng();
-
     const geocoder = new kakao.maps.services.Geocoder();
 
     geocoder.coord2Address(lng, lat, (result, status) => {
       if (status !== kakao.maps.services.Status.OK) return;
 
-      const address = result[0].road_address
-        ? result[0].road_address.address_name
-        : result[0].address.address_name;
+      const address =
+        result[0].road_address?.address_name ?? result[0].address.address_name;
 
       findNearestPlace(lat, lng, placeName => {
-        // 마커 추가 없이 pending 상태만 저장
         setPendingPlace({ lat, lng, placeName, address });
         setSelectedPlace({ placeName, address, proposedBy: '나' });
         setIsSheetOpen(true);
@@ -111,28 +144,37 @@ const PromiseMap = () => {
     });
   };
 
-  // 토스트 메시지 관리
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowToast(false);
-    }, 2000);
+  const isPendingAdded = pendingPlace
+    ? markers.some(
+        m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
+      )
+    : false;
 
-    return () => clearTimeout(timer);
-  }, []);
+  // 마커 추가 및 제거
+  const handleToggleAdd = (isAdded: boolean) => {
+    if (!pendingPlace) return;
 
-  // 오프라인 여부 확인
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    if (isAdded) {
+      setMarkers(prev => {
+        const alreadyExists = prev.some(
+          m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
+        );
+        if (alreadyExists) return prev;
+        return [...prev, { ...pendingPlace }];
+      });
+    } else {
+      setMarkers(prev =>
+        prev.filter(
+          m => !(m.lat === pendingPlace.lat && m.lng === pendingPlace.lng),
+        ),
+      );
+    }
+  };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+  const handleSheetClose = () => {
+    setIsSheetOpen(false);
+    setPendingPlace(null);
+  };
 
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
@@ -141,15 +183,11 @@ const PromiseMap = () => {
         style={{ width: '100%', height: '100%' }}
         onClick={handleMapClick}
       >
-        {/* 클릭한 위치에 마커 표시 */}
         {markers.map((marker, i) => (
           <MapMarker
             key={i}
             position={{ lat: marker.lat, lng: marker.lng }}
-            image={{
-              src: CustomMarkerIcon,
-              size: { width: 30, height: 30 },
-            }}
+            image={{ src: CustomMarkerIcon, size: { width: 30, height: 30 } }}
             onClick={() => {
               setPendingPlace(marker);
               setSelectedPlace({
@@ -162,13 +200,14 @@ const PromiseMap = () => {
           />
         ))}
       </Map>
+
+      {/* 약속 정보 카드 */}
       <div className="absolute top-0 left-0 pl-4 pt-5 z-10">
         <div className="px-4.5 py-4 flex flex-col items-start gap-1 bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.10)]">
           <p className="text-[#111111] font-Pretendard font-semibold text-[1.125rem] leading-4.5">
             {promise?.title}
           </p>
           <div className="flex">
-            {/* 참여자 인원으로 변경 예정 */}
             {Array.from({ length: promise?.memberCount ?? 1 }).map((_, i) => (
               <img
                 key={i}
@@ -182,7 +221,7 @@ const PromiseMap = () => {
         </div>
       </div>
 
-      {/* 댓글 바텀 시트만 구현 + 위치 지정 미구현 */}
+      {/* 채팅 버튼 */}
       {!isSheetOpen && (
         <div
           className={`absolute right-6 z-50 ${markers.length > 0 ? 'bottom-48' : 'bottom-30'}`}
@@ -199,7 +238,7 @@ const PromiseMap = () => {
         onClose={() => setIsChatOpen(false)}
       />
 
-      {/* 마커 없을 경우 토스트 메시지 */}
+      {/* 마커 없을 때 안내 토스트 */}
       {showToast && isOnline && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <ToastMessage
@@ -209,7 +248,7 @@ const PromiseMap = () => {
         </div>
       )}
 
-      {/* 오프라인일 경우 토스트 메시지 */}
+      {/* 오프라인 토스트 */}
       {!isOnline && (
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <ToastMessage
@@ -219,64 +258,29 @@ const PromiseMap = () => {
         </div>
       )}
 
-      {/* 마커 존재할 경우 기본 바텀 시트 */}
+      {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}
       {markers.length > 0 && (
         <VoteBottomSheet
           isOpen={!isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          count={2} // 임시
+          count={2}
           promiseId={promiseId}
           promise={promise}
         />
       )}
 
-      {/* 마커 등록 시 가게 정보 바텀 시트 */}
+      {/* 장소 선택 시 상세 바텀 시트 */}
       {selectedPlace && (
         <LocationBottomSheet
           isOpen={isSheetOpen}
-          onClose={() => {
-            setIsSheetOpen(false);
-            setPendingPlace(null); // 바텀시트 닫을 때 pending 초기화
-          }}
-          placeName={selectedPlace?.placeName ?? ''}
-          address={selectedPlace?.address ?? ''}
-          proposedBy={selectedPlace?.proposedBy ?? '나'}
-          isAdded={
-            pendingPlace
-              ? markers.some(
-                  m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
-                )
-              : false
-          }
-          onToggleAdd={isAdded => {
-            if (!pendingPlace) return;
-            if (isAdded) {
-              // 플러스 눌렀을 때 마커 추가
-              setMarkers(prev => {
-                const alreadyExists = prev.some(
-                  m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
-                );
-                if (alreadyExists) return prev;
-                return [
-                  ...prev,
-                  {
-                    lat: pendingPlace.lat,
-                    lng: pendingPlace.lng,
-                    placeName: pendingPlace.placeName,
-                    address: pendingPlace.address,
-                  },
-                ];
-              });
-            } else {
-              // 체크 상태에서 다시 누르면 마커 제거
-              setMarkers(prev =>
-                prev.filter(
-                  m =>
-                    !(m.lat === pendingPlace.lat && m.lng === pendingPlace.lng),
-                ),
-              );
-            }
-          }}
+          onClose={handleSheetClose}
+          placeName={selectedPlace.placeName}
+          address={selectedPlace.address}
+          proposedBy={selectedPlace.proposedBy}
+          isAdded={isPendingAdded}
+          onToggleAdd={handleToggleAdd}
+          isVoted={isVoted}
+          onToggleVote={voted => setIsVoted(voted)}
         />
       )}
     </div>

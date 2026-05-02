@@ -2,6 +2,7 @@ import BottomSheet from '@/components/common/BottomSheet';
 import MemberIcon from '@/assets/images/memberIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
 import NomineeCheckIcon from '@/assets/images/map/nomineeCheckIcon.svg';
+import VoteIcon from '@/assets/images/map/voteIcon.svg';
 
 interface LocationBottomSheetProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ interface LocationBottomSheetProps {
   proposedBy: string;
   isAdded: boolean;
   onToggleAdd: (isAdded: boolean) => void;
+  isVoted: boolean;
+  onToggleVote: (isVoted: boolean) => void;
 }
 
 const LocationBottomSheet = ({
@@ -21,6 +24,8 @@ const LocationBottomSheet = ({
   proposedBy,
   isAdded,
   onToggleAdd,
+  isVoted,
+  onToggleVote,
 }: LocationBottomSheetProps) => {
   return (
     <BottomSheet
@@ -43,19 +48,26 @@ const LocationBottomSheet = ({
               </p>
             </div>
           </div>
-          <div
-            className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
-            onClick={() => onToggleAdd(!isAdded)}
-          >
-            <img
-              src={isAdded ? NomineeCheckIcon : PlusIcon}
-              className="w-6 h-6"
-            />
+          <div className="flex gap-5">
+            <div
+              className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
+              onClick={() => onToggleVote(!isVoted)}
+            >
+              <img src={VoteIcon} />
+            </div>
+            <div
+              className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
+              onClick={() => onToggleAdd(!isAdded)}
+            >
+              <img
+                src={isAdded ? NomineeCheckIcon : PlusIcon}
+                className="w-6 h-6"
+              />
+            </div>
           </div>
         </div>
         <p className="whitespace-pre-line text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5">
           {`📍 ${address}\n ⏰ \n💸`}
-          {/* {`📍 120m  서울 용산구 이태원동 123-45\n 11:00 - 22:00\n💸 2.5만원대`} */}
         </p>
       </div>
     </BottomSheet>
