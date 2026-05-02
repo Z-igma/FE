@@ -9,11 +9,11 @@ import {
 import LocationBottomSheet from './components/LocationBottomSheet';
 import VoteBottomSheet from './components/VoteBottomSheet';
 import CommentBottomSheet from './components/CommentBottomSheet';
+import LocationMarker from './components/LocationMarker';
 import ToastMessage from '@/components/common/ToastMessage';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import ChatIcon from '@/assets/images/map/chatIcon.svg';
-import LocationMarker from './components/LocationMarker';
 
 const CATEGORIES = [
   'FD6', // 음식점
@@ -35,6 +35,13 @@ interface SelectedPlace {
   proposedBy: string;
 }
 
+interface Comment {
+  id: string;
+  lat: number;
+  lng: number;
+  text: string;
+}
+
 const PromiseMap = () => {
   const { state } = useLocation();
   const { promiseId } = useParams();
@@ -45,10 +52,10 @@ const PromiseMap = () => {
   // 바텀 시트 관리
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>( // 선택된 장소 정보
+  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>(
     null,
   );
-  const [markers, setMarkers] = useState<Marker[]>([]); // 등록된 마커
+  const [markers, setMarkers] = useState<Marker[]>([]);
   const [pendingPlace, setPendingPlace] = useState<Marker | null>(null);
 
   // 단일 투표
@@ -57,10 +64,18 @@ const PromiseMap = () => {
   const [votedPlaces, setVotedPlaces] = useState<Set<string>>(new Set());
   const placeKey = (lat: number, lng: number) => `${lat}_${lng}`;
 
-  const [showToast, setShowToast] = useState(true); // 토스트 메시지 관리
-  const [isOnline, setIsOnline] = useState(navigator.onLine); // 네트워크 상태
-
+  const [showToast, setShowToast] = useState(true);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [selectedOverlay, setSelectedOverlay] = useState<Marker | null>(null);
+
+  // 코멘트 관련 상태
+  const [isCommentMode, setIsCommentMode] = useState(false);
+  const [commentLatLng, setCommentLatLng] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [openCommentId, setOpenCommentId] = useState<string | null>(null);
 
   // 사용자 위치를 중심으로 설정
   useEffect(() => {
@@ -81,7 +96,6 @@ const PromiseMap = () => {
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {
@@ -102,9 +116,7 @@ const PromiseMap = () => {
   ) => {
     const places = new kakao.maps.services.Places();
     const location = new kakao.maps.LatLng(lat, lng);
-
     const results: kakao.maps.services.PlacesSearchResult = [];
-
     let completed = 0;
 
     CATEGORIES.forEach(category => {
@@ -137,22 +149,32 @@ const PromiseMap = () => {
     _: kakao.maps.Map,
     mouseEvent: kakao.maps.event.MouseEvent,
   ) => {
-    setSelectedOverlay(null); // 추가
+    if (openCommentId) return;
+
+    const lat = mouseEvent.latLng.getLat();
+    const lng = mouseEvent.latLng.getLng();
+
+    // 코멘트 모드 분기
+    if (isCommentMode) {
+      setIsSheetOpen(false);
+      setSelectedOverlay(null);
+      setCommentLatLng({ lat, lng });
+      setIsChatOpen(true);
+      setIsCommentMode(false);
+      return;
+    }
+
+    setSelectedOverlay(null);
     if (isSheetOpen) {
       setIsSheetOpen(false);
       return;
     }
 
-    const lat = mouseEvent.latLng.getLat();
-    const lng = mouseEvent.latLng.getLng();
     const geocoder = new kakao.maps.services.Geocoder();
-
     geocoder.coord2Address(lng, lat, (result, status) => {
       if (status !== kakao.maps.services.Status.OK) return;
-
       const address =
         result[0].road_address?.address_name ?? result[0].address.address_name;
-
       findNearestPlace(lat, lng, placeName => {
         setPendingPlace({ lat, lng, placeName, address });
         setSelectedPlace({ placeName, address, proposedBy: '나' });
@@ -217,6 +239,10 @@ const PromiseMap = () => {
     : false;
 
   const isConfirmed = false;
+
+  // 모바일 오류 해결
+  const generateId = () =>
+    Math.random().toString(36).slice(2) + Date.now().toString(36);
 
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
@@ -288,6 +314,62 @@ const PromiseMap = () => {
             </>
           ))}
         </MarkerClusterer>
+
+        {/* 등록된 코멘트 핀 */}
+        {comments.map(comment => (
+          <CustomOverlayMap
+            key={comment.id}
+            position={{ lat: comment.lat, lng: comment.lng }}
+            yAnchor={1}
+            xAnchor={0.5}
+          >
+            <div className="flex flex-col items-center">
+              {openCommentId === comment.id && (
+                <div
+                  className="relative flex flex-col gap-1 mb-2 p-2 bg-[#353535] rounded-lg shadow-lg w-34"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setOpenCommentId(null);
+                  }}
+                >
+                  {/* 상단 프로필 + 이름 */}
+                  <div className="flex items-center gap-1 mb-1.5">
+                    <img
+                      src={MapMemberIcon}
+                      className="w-4 h-4 rounded-full"
+                      alt="프로필"
+                    />
+                    <span className="text-[#FFFFFF] text-[0.5rem] font-semibold leading-2">
+                      000
+                    </span>
+                  </div>
+                  {/* 댓글 텍스트 */}
+                  <p className="text-[#FFFFFF] text-[0.5rem] font-light leading-2">
+                    {comment.text}
+                  </p>
+                  {/* 왼쪽 아래 꼬리 */}
+                  <div className="absolute -left-2 top-9 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-8 border-t-transparent border-b-transparent border-r-[#2D2D2D]" />
+                </div>
+              )}
+              {openCommentId !== comment.id && (
+                <div className="relative">
+                  <div
+                    className="w-7.5 h-7.5 rounded-full bg-[#00408E] flex items-center justify-center text-white text-xs font-semibold cursor-pointer"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setOpenCommentId(
+                        openCommentId === comment.id ? null : comment.id,
+                      );
+                    }}
+                  >
+                    <img src={MapMemberIcon} className="w-5.5 h-5.5" />
+                  </div>
+                  <div className="absolute -bottom-1 left-1 w-0 h-0 border-t-10 border-r-15 border-t-[#00408E] border-r-transparent rotate-12" />
+                </div>
+              )}
+            </div>
+          </CustomOverlayMap>
+        ))}
       </Map>
 
       {/* 약속 정보 카드 */}
@@ -314,9 +396,15 @@ const PromiseMap = () => {
       {!isSheetOpen && !isChatOpen && (
         <div
           className={`absolute right-6 z-50 ${markers.length > 0 ? 'bottom-48' : 'bottom-35'}`}
-          onClick={() => setIsChatOpen(true)}
+          onClick={() => {
+            setIsSheetOpen(false);
+            setSelectedOverlay(null);
+            setIsCommentMode(prev => !prev);
+          }}
         >
-          <div className="flex pl-3 pt-3 pr-3.5 pb-3.5 w-15 h-15 rounded-full bg-[#00408E]">
+          <div
+            className={`flex pl-3 pt-3 pr-3.5 pb-3.5 w-15 h-15 rounded-full transition-colors ${isCommentMode ? 'bg-[#FF6B35]' : 'bg-[#00408E]'}`}
+          >
             <img src={ChatIcon} />
           </div>
         </div>
@@ -325,12 +413,22 @@ const PromiseMap = () => {
       {isChatOpen && (
         <CommentBottomSheet
           isOpen={isChatOpen}
-          onClose={() => setIsChatOpen(false)}
+          onClose={() => {
+            setIsChatOpen(false);
+            setCommentLatLng(null);
+          }}
+          latLng={commentLatLng}
+          onSubmit={(text, latLng) => {
+            setComments(prev => [
+              ...prev,
+              { id: generateId(), ...latLng, text },
+            ]);
+          }}
         />
       )}
 
       {/* 마커 없을 때 안내 토스트 */}
-      {showToast && isOnline && (
+      {showToast && isOnline && !isCommentMode && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <ToastMessage
             title="장소가 없어요"
@@ -350,7 +448,7 @@ const PromiseMap = () => {
       )}
 
       {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}
-      {markers.length > 0 && (
+      {markers.length > 0 && !isCommentMode && !isChatOpen && (
         <VoteBottomSheet
           isOpen={!isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
@@ -361,7 +459,7 @@ const PromiseMap = () => {
       )}
 
       {/* 장소 선택 시 상세 바텀 시트 */}
-      {selectedPlace && (
+      {selectedPlace && !isCommentMode && (
         <LocationBottomSheet
           isOpen={isSheetOpen}
           onClose={handleSheetClose}
