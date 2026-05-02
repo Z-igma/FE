@@ -43,12 +43,26 @@ const BottomNavBar = () => {
 
   // 비로그인 시 기본 지도 및 홈 화면만 접근 가능
   const handleTabClick = (path: string) => {
+    if (activeTab === path) return;
+
     if (!isLoggedIn && path !== '/map' && path !== '/home') {
       navigate('/login');
       return;
     }
     navigate(path);
   };
+
+  const getActiveTab = (pathname: string) => {
+    if (pathname.startsWith('/map')) {
+      if (pathname.endsWith('/confirmed')) return '/promise';
+      return '/map';
+    }
+    if (pathname.startsWith('/promise')) return '/promise';
+    if (pathname.startsWith('/account')) return '/account';
+    return '/home';
+  };
+
+  const activeTab = getActiveTab(pathname);
 
   return (
     <nav className="flex justify-between items-center fixed bottom-1 w-full max-w-[393px] px-9.5 py-3.75 bg-[#FFFFFF] shadow-[0_4px_20px_0_rgba(17,17,17,0.04)] rounded-t-[20px] left-1/2 -translate-x-1/2">
@@ -58,7 +72,10 @@ const BottomNavBar = () => {
           onClick={() => handleTabClick(path)}
           className="flex flex-col items-center gap-1.25 text-xs"
         >
-          <img src={pathname === path ? activeIcon : defaultIcon} alt={label} />
+          <img
+            src={activeTab === path ? activeIcon : defaultIcon}
+            alt={label}
+          />
           <span className="font-normal font-Pretendard leading-4 text-[#111111]">
             {label}
           </span>
