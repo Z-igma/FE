@@ -222,7 +222,7 @@ const PromiseMap = () => {
     <div className="relative w-full h-screen pb-24 overflow-hidden">
       <Map
         center={center}
-        style={{ width: '100%', height: 'calc(100% - 6rem)' }}
+        style={{ width: '100%', height: '100%' }}
         onClick={handleMapClick}
       >
         <MarkerClusterer
