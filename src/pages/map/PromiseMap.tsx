@@ -44,7 +44,13 @@ const PromiseMap = () => {
   );
   const [markers, setMarkers] = useState<Marker[]>([]); // 등록된 마커
   const [pendingPlace, setPendingPlace] = useState<Marker | null>(null);
-  const [isVoted, setIsVoted] = useState(false); // 투표 상태 관리
+
+  // 단일 투표
+  const [votedPlace, setVotedPlace] = useState<string | null>(null);
+  // 복수 투표
+  const [votedPlaces, setVotedPlaces] = useState<Set<string>>(new Set());
+  const placeKey = (lat: number, lng: number) => `${lat}_${lng}`;
+
   const [showToast, setShowToast] = useState(true); // 토스트 메시지 관리
   const [isOnline, setIsOnline] = useState(navigator.onLine); // 네트워크 상태
 
@@ -77,6 +83,8 @@ const PromiseMap = () => {
   }, []);
 
   if (!promise) return null;
+
+  const isMultipleVoting = promise?.isMultipleVoting ?? false;
 
   // 클릭 좌표 내 음식점 조회
   const findNearestPlace = (
@@ -171,10 +179,33 @@ const PromiseMap = () => {
     }
   };
 
+  // 투표 토글
+  const handleToggleVote = (voted: boolean) => {
+    if (!pendingPlace) return;
+    const key = placeKey(pendingPlace.lat, pendingPlace.lng);
+
+    if (isMultipleVoting) {
+      setVotedPlaces(prev => {
+        const next = new Set(prev);
+        voted ? next.add(key) : next.delete(key);
+        return next;
+      });
+    } else {
+      setVotedPlace(voted ? key : null);
+    }
+  };
+
   const handleSheetClose = () => {
     setIsSheetOpen(false);
     setPendingPlace(null);
   };
+
+  // 현재 장소 투표 여부
+  const isVoted = pendingPlace
+    ? isMultipleVoting
+      ? votedPlaces.has(placeKey(pendingPlace.lat, pendingPlace.lng))
+      : votedPlace === placeKey(pendingPlace.lat, pendingPlace.lng)
+    : false;
 
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
@@ -280,7 +311,7 @@ const PromiseMap = () => {
           isAdded={isPendingAdded}
           onToggleAdd={handleToggleAdd}
           isVoted={isVoted}
-          onToggleVote={voted => setIsVoted(voted)}
+          onToggleVote={handleToggleVote}
         />
       )}
     </div>

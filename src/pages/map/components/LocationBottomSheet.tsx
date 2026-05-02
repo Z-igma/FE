@@ -1,7 +1,7 @@
 import BottomSheet from '@/components/common/BottomSheet';
 import MemberIcon from '@/assets/images/memberIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
-import NomineeCheckIcon from '@/assets/images/map/nomineeCheckIcon.svg';
+import NomineeMinusIcon from '@/assets/images/map/nomineeMinusIcon.svg';
 import VoteIcon from '@/assets/images/map/voteIcon.svg';
 
 interface LocationBottomSheetProps {
@@ -50,17 +50,19 @@ const LocationBottomSheet = ({
           </div>
           <div className="flex gap-5">
             <div
-              className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
-              onClick={() => onToggleVote(!isVoted)}
+              className={`w-9 h-9 p-1.5 rounded-full ${
+                !isAdded ? 'opacity-30' : 'cursor-pointer'
+              } ${isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
+              onClick={() => isAdded && onToggleVote(!isVoted)}
             >
               <img src={VoteIcon} />
             </div>
             <div
-              className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
+              className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#D40004]' : 'bg-[#00408E]'}`}
               onClick={() => onToggleAdd(!isAdded)}
             >
               <img
-                src={isAdded ? NomineeCheckIcon : PlusIcon}
+                src={isAdded ? NomineeMinusIcon : PlusIcon}
                 className="w-6 h-6"
               />
             </div>
