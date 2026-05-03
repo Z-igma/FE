@@ -429,22 +429,30 @@ const PromiseMap = () => {
 
       {/* 마커 없을 때 안내 토스트 */}
       {showToast && isOnline && !isCommentMode && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-          <ToastMessage
-            title="장소가 없어요"
-            subTitle="지도를 눌러 추가해 보세요"
-          />
-        </div>
+        <>
+          <div className="fixed inset-x-0 top-0 bottom-24 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50" />
+
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+            <ToastMessage
+              title="장소가 없어요"
+              subTitle="지도를 눌러 추가해 보세요"
+            />
+          </div>
+        </>
       )}
 
       {/* 오프라인 토스트 */}
       {!isOnline && (
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-          <ToastMessage
-            title="오프라인 상태입니다"
-            subTitle="장소를 추가할 수 없어요"
-          />
-        </div>
+        <>
+          <div className="fixed inset-x-0 top-0 bottom-24 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50" />
+
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+            <ToastMessage
+              title="오프라인 상태입니다"
+              subTitle="장소를 추가할 수 없어요"
+            />
+          </div>
+        </>
       )}
 
       {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}

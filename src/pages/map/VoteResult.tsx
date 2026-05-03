@@ -74,8 +74,8 @@ const VoteResult = () => {
         ? '다시 투표하기' // 첫 투표 동점
         : '장소 결정하기'; // 일반
 
-  // 재투표 중엔 후보지 선택을 하면 항상 활성화지만 디폴트는 투표를 시작하면 활성화
-  const buttonDisabled = isRevote ? myVote === null : !hasVote;
+  // 재투표 중엔 항상 활성화지만 디폴트는 투표를 시작하면 활성화
+  const buttonDisabled = isRevote ? false : !hasVote;
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmedCandidate, setConfirmedCandidate] = useState<

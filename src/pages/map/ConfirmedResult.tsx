@@ -14,10 +14,6 @@ const ConfirmedResult = () => {
   const today =
     new Date().toDateString() === new Date(promise.date).toDateString();
 
-  console.log(new Date().toDateString());
-  console.log(new Date(promise.promisedAt).toDateString());
-  console.log(today);
-
   return (
     <div className="flex flex-col gap-3">
       <Header title="일정 확정" />
@@ -65,20 +61,32 @@ const ConfirmedResult = () => {
           />
         </div>
         <div className="fixed bottom-25 pb-6 px-4 flex gap-4 w-full">
+          {!today ? (
+            <button
+              className="flex-1 py-4 border border-[#C6C6C6] rounded-[10px] bg-[#FFFFFF] active:bg-[#00408E]"
+              onClick={() => setIsCalendarModalOpen(true)}
+            >
+              <p className="text-[#111111] font-Pretendard font-normal text-[1rem] leading-4 active:text-[#FFFFFF]">
+                캘린더 저장
+              </p>
+            </button>
+          ) : (
+            <button
+              className="flex-1 py-4 border border-[#C6C6C6] rounded-[10px] bg-[#FFFFFF] active:bg-[#00408E]"
+              // 예약 확인 연결 예정
+            >
+              <p className="text-[#111111] font-Pretendard font-normal text-[1rem] leading-4 active:text-[#FFFFFF]">
+                예약 확인
+              </p>
+            </button>
+          )}
+
           <button
             className="flex-1 py-4 border border-[#C6C6C6] rounded-[10px] bg-[#FFFFFF] active:bg-[#00408E]"
-            onClick={() => setIsCalendarModalOpen(true)}
+            // 길찾기 링크 연결 예정
           >
             <p className="text-[#111111] font-Pretendard font-normal text-[1rem] leading-4 active:text-[#FFFFFF]">
-              캘린더 저장
-            </p>
-          </button>
-          <button
-            className="flex-1 py-4 border border-[#C6C6C6] rounded-[10px] bg-[#FFFFFF] active:bg-[#00408E]"
-            onClick={() => setIsCalendarModalOpen(true)}
-          >
-            <p className="text-[#111111] font-Pretendard font-normal text-[1rem] leading-4 active:text-[#FFFFFF]">
-              캘린더 저장
+              길찾기
             </p>
           </button>
         </div>
