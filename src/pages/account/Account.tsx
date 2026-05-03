@@ -87,8 +87,8 @@ const Account = () => {
               </p>
             )}
           </div>
-          <div className="flex justify-between">
-            <div className="flex flex-col px-10 h-19 items-center justify-center text-center bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px]">
+          <div className="flex gap-3">
+            <div className="flex flex-col w-1/2 h-19 items-center justify-center text-center bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px]">
               <p className="text-[#000000] font-Pretendard font-light text-[0.75rem] leading-4.2">
                 참여 중인 약속
               </p>
@@ -96,7 +96,7 @@ const Account = () => {
                 {myPromise.joined}
               </p>
             </div>
-            <div className="flex flex-col px-13 h-19 items-center justify-center text-center bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px]">
+            <div className="flex flex-col w-1/2 h-19 items-center justify-center text-center bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px]">
               <p className="text-[#000000] font-Pretendard font-light text-[0.75rem] leading-4.2">
                 만든 약속
               </p>
