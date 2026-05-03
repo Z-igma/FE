@@ -254,7 +254,13 @@ const CreatePromiseForm = () => {
         </div>
       </div>
 
-      <BottomButton text="만들기" disabled={!isValid} onClick={handleSubmit} />
+      <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
+        <BottomButton
+          text="만들기"
+          disabled={!isValid}
+          onClick={handleSubmit}
+        />
+      </div>
     </div>
   );
 };

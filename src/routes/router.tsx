@@ -9,6 +9,9 @@ import Map from '@/pages/map/Map';
 import NotFound from '@/pages/notFound/NotFound';
 import Promise from '@/pages/promise/Promise';
 import CreatePromiseForm from '@/pages/promise/CreatePromiseForm';
+import PromiseMap from '@/pages/map/PromiseMap';
+import VoteResult from '@/pages/map/VoteResult';
+import ConfirmedResult from '@/pages/map/ConfirmedResult';
 
 const router = createBrowserRouter([
   { path: '/', element: <Splash /> },
@@ -18,6 +21,9 @@ const router = createBrowserRouter([
     children: [
       { path: '/home', element: <Home /> },
       { path: '/map', element: <Map /> },
+      { path: '/map/:promiseId', element: <PromiseMap /> },
+      { path: '/map/:promiseId/vote', element: <VoteResult /> },
+      { path: '/map/:promiseId/confirmed', element: <ConfirmedResult /> },
       {
         element: <ProtectedRoute />,
         children: [
