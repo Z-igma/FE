@@ -184,9 +184,7 @@ const PromiseMap = () => {
   };
 
   const isPendingAdded = pendingPlace
-    ? markers.some(
-        m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
-      )
+    ? markers.some(m => m.placeName === pendingPlace.placeName)
     : false;
 
   // 마커 추가 및 제거
@@ -196,16 +194,14 @@ const PromiseMap = () => {
     if (isAdded) {
       setMarkers(prev => {
         const alreadyExists = prev.some(
-          m => m.lat === pendingPlace.lat && m.lng === pendingPlace.lng,
+          m => m.placeName === pendingPlace.placeName,
         );
         if (alreadyExists) return prev;
         return [...prev, { ...pendingPlace }];
       });
     } else {
       setMarkers(prev =>
-        prev.filter(
-          m => !(m.lat === pendingPlace.lat && m.lng === pendingPlace.lng),
-        ),
+        prev.filter(m => m.placeName !== pendingPlace.placeName),
       );
     }
   };
