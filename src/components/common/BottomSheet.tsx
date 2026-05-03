@@ -28,7 +28,7 @@ const BottomSheet = ({
   return (
     <div className="fixed inset-0 z-50 pointer-events-none">
       <div
-        className={`absolute bottom-[5.5rem] left-0 w-full bg-white rounded-t-2xl transition-all duration-300 pointer-events-auto ${
+        className={`absolute bottom-22 left-0 w-full bg-white rounded-t-2xl transition-all duration-300 pointer-events-auto ${
           isExpanded ? fullHeight : peekHeight
         } ${!isExpanded ? 'overflow-hidden' : ''}`}
       >

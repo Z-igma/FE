@@ -45,18 +45,18 @@ const CandidatesCard = ({
       onClick={isSelectable ? onSelect : undefined}
     >
       <div className="flex justify-between items-start">
-        <div className="flex flex-col gap-1">
-          <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7">
+        <div className="flex flex-col gap-1 min-w-0">
+          <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7 truncate">
             {name}
           </p>
-          <p className="text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5">
+          <p className="text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5 truncate">
             📍 {distance}m {address}
           </p>
         </div>
 
         {/* 1위 */}
         {status === 'best' && !hideBadge && (
-          <div className="bg-[#E8F5E9] px-4 py-1.5 rounded-full">
+          <div className="bg-[#E8F5E9] px-4 py-1.5 rounded-full shrink-0">
             <p className="text-[#2E7D32] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               👑 1위
             </p>
@@ -65,7 +65,7 @@ const CandidatesCard = ({
 
         {/* 동점 */}
         {status === 'tie' && !hideBadge && (
-          <div className="bg-[#FF9800] px-4 py-1.5 rounded-full">
+          <div className="bg-[#FF9800] px-4 py-1.5 rounded-full shrink-0">
             <p className="text-[#FFFFFF] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               동점
             </p>

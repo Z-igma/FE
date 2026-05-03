@@ -68,8 +68,8 @@ const LocationBottomSheet = ({
       ) : (
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
-            <div className="flex flex-col gap-0.5">
-              <p className="text-[#111111] font-Pretendard font-semibold text-[1.375rem] leading-7.7">
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <p className="text-[#111111] font-Pretendard font-semibold text-[1.375rem] leading-7.7 truncate">
                 {placeName}
               </p>
               <div className="flex gap-0.5 items-center">

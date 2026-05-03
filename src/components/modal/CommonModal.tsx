@@ -34,7 +34,7 @@ const CommonModal = ({
             </p>
           )}
           <p
-            className={`text-[#111111] font-Pretendard font-semibold ${mainTextSize} leading-11.2`}
+            className={`text-[#111111] font-Pretendard font-semibold ${mainTextSize} leading-11.2 truncate`}
           >
             {mainText}
           </p>
