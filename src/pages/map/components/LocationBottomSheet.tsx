@@ -88,14 +88,16 @@ const LocationBottomSheet = ({
               </div>
             ) : (
               <div className="flex gap-5">
-                <div
-                  className={`w-9 h-9 p-1.5 rounded-full ${
-                    !isAdded ? 'opacity-30' : 'cursor-pointer'
-                  } ${isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
-                  onClick={() => isAdded && onToggleVote(!isVoted)}
-                >
-                  <img src={VoteIcon} />
-                </div>
+                {isAdded && (
+                  <div
+                    className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${
+                      isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'
+                    }`}
+                    onClick={() => onToggleVote(!isVoted)}
+                  >
+                    <img src={VoteIcon} />
+                  </div>
+                )}
                 <div
                   className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#D40004]' : 'bg-[#00408E]'}`}
                   onClick={() => onToggleAdd(!isAdded)}
