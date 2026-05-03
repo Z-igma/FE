@@ -9,12 +9,15 @@ const Account = () => {
   const { logout } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [bio, setBio] = useState('한 줄 소개를 적어 주세요!');
+
+  // 교체 에정 약속 데이터
   // const [myPromise, setMyPromise] = useState({
   const [myPromise] = useState({
     joined: 1,
     created: 1,
   });
 
+  // 교체 예정 유저 정보
   // const [userInfo, setUserInfo] = useState({
   const [userInfo] = useState({
     name: '지그마',
@@ -22,16 +25,11 @@ const Account = () => {
     profileImage: null as string | null,
   });
 
+  // 위치 권한 요청
   const handleLocationPermission = () => {
     navigator.geolocation.getCurrentPosition(
-      () => {
-        // 허용
-        console.log('위치 권한 허용');
-      },
-      () => {
-        // 거부
-        console.log('위치 권한 거부');
-      },
+      () => console.log('위치 권한 허용'),
+      () => console.log('위치 권한 거부'),
     );
   };
 
@@ -57,12 +55,12 @@ const Account = () => {
                 <p className="text-[#000000] font-Pretendard font-semibold text-[1.25rem] leading-7">
                   {userInfo.name || '이름'}
                 </p>
-
                 <p className="text-[#888888] font-Pretendard font-regular text-[0.75rem] leading-4.2">
                   {userInfo.email || '이메일'}
                 </p>
               </div>
             </div>
+            {/* 바이오 빈 문자열 불가 */}
             <div
               className="h-5.5 py-0.5 px-3 bg-[#FFFFFF] rounded-[10px] cursor-pointer"
               onClick={() => {
