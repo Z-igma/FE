@@ -32,6 +32,8 @@ jobs:
     runs-on: ubuntu-latest # 최신 우분투 환경에서 실행
     timeout-minutes: 5 # 5분 제한(넘어가면 배포 실패)
     needs: build # 빌드 작업이 성공적으로 끝나야 실행
+    permissions:
+      contents: write
     steps:
       - name: Download build artifact # 빌드 후 업로드한 dist artifact 다운
         uses: actions/download-artifact@v4
