@@ -93,10 +93,10 @@ const PromiseMap = () => {
   };
 
   return (
-    <div className="relative w-full h-screen pb-24 overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
       <Map
         center={center}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: 'calc(100% - 6rem)' }}
         onClick={handleMapClick}
       >
         <MarkerClusterer
