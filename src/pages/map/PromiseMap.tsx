@@ -93,7 +93,7 @@ const PromiseMap = () => {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="fixed inset-0 overflow-hidden">
       <Map
         center={center}
         style={{ width: '100%', height: 'calc(100% - 6rem)' }}
