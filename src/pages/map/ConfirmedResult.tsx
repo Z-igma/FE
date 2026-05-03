@@ -11,6 +11,8 @@ const ConfirmedResult = () => {
   const candidate = state?.confirmedCandidate;
 
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+
+  // 약속 날짜가 오늘인지 여부
   const today =
     new Date().toDateString() === new Date(promise.date).toDateString();
 
@@ -60,6 +62,7 @@ const ConfirmedResult = () => {
             memberCount={promise.memberCount}
           />
         </div>
+
         <div className="fixed bottom-25 pb-6 px-4 flex gap-4 w-full">
           {!today ? (
             <button

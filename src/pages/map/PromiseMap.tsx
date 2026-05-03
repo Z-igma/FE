@@ -11,10 +11,14 @@ import VoteBottomSheet from './components/VoteBottomSheet';
 import CommentBottomSheet from './components/CommentBottomSheet';
 import LocationMarker from './components/LocationMarker';
 import ToastMessage from '@/components/common/ToastMessage';
+import { useMapLocation } from './hooks/useMapLocation';
+import { useVoteState } from './hooks/useVoteState';
+import type { Marker, SelectedPlace, Comment } from '@/types/map';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import ChatIcon from '@/assets/images/map/chatIcon.svg';
 
+/** 카카오 장소 검색 카테고리 코드 */
 const CATEGORIES = [
   'FD6', // 음식점
   'CE7', // 카페
@@ -22,51 +26,31 @@ const CATEGORIES = [
   'AT4', // 관광 명소
 ];
 
-interface Marker {
-  lat: number;
-  lng: number;
-  placeName: string;
-  address: string;
-}
-
-interface SelectedPlace {
-  placeName: string;
-  address: string;
-  proposedBy: string;
-}
-
-interface Comment {
-  id: string;
-  lat: number;
-  lng: number;
-  text: string;
-}
-
 const PromiseMap = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const { promiseId } = useParams();
   const promise = state?.promise;
 
-  const [center, setCenter] = useState({ lat: 37.5823688, lng: 127.0111299 });
+  const { center, isOnline } = useMapLocation();
+  const isMultipleVoting = promise?.isMultipleVoting ?? false;
 
-  // 바텀 시트 관리
+  const {
+    markers,
+    votedPlace,
+    votedPlaces,
+    handleToggleAdd,
+    handleToggleVote,
+    getIsVoted,
+  } = useVoteState({ isMultipleVoting });
+
+  // 바텀 시트 관련 상태
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>(
     null,
   );
-  const [markers, setMarkers] = useState<Marker[]>([]);
   const [pendingPlace, setPendingPlace] = useState<Marker | null>(null);
-
-  // 단일 투표
-  const [votedPlace, setVotedPlace] = useState<string | null>(null);
-  // 복수 투표
-  const [votedPlaces, setVotedPlaces] = useState<Set<string>>(new Set());
-  const placeKey = (lat: number, lng: number) => `${lat}_${lng}`;
-
-  const [showToast, setShowToast] = useState(true);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [selectedOverlay, setSelectedOverlay] = useState<Marker | null>(null);
 
   // 코멘트 관련 상태
@@ -78,38 +62,16 @@ const PromiseMap = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [openCommentId, setOpenCommentId] = useState<string | null>(null);
 
-  // 사용자 위치를 중심으로 설정
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(position => {
-      setCenter({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      });
-    });
-  }, []);
+  const [showToast, setShowToast] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowToast(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  // 온오프라인 감지
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
   if (!promise) return null;
 
-  const isMultipleVoting = promise?.isMultipleVoting ?? false;
-
-  // 클릭 좌표 내 음식점 조회
+  // 클릭 좌표 반경 50m 내 가장 가까운 장소명 조회
   const findNearestPlace = (
     lat: number,
     lng: number,
@@ -129,14 +91,11 @@ const PromiseMap = () => {
           }
           completed++;
 
-          // 모든 카테고리 조회 완료 시
           if (completed === CATEGORIES.length) {
             if (results.length === 0) {
               callback('선택한 위치');
               return;
             }
-
-            // 거리순 정렬 후 가장 가까운 장소 반환
             results.sort((a, b) => Number(a.distance) - Number(b.distance));
             callback(results[0].place_name);
           }
@@ -146,6 +105,7 @@ const PromiseMap = () => {
     });
   };
 
+  // 지도 클릭 시 장소 조회 후 바텀 시트 표시
   const handleMapClick = (
     _: kakao.maps.Map,
     mouseEvent: kakao.maps.event.MouseEvent,
@@ -156,7 +116,6 @@ const PromiseMap = () => {
     const lat = mouseEvent.latLng.getLat();
     const lng = mouseEvent.latLng.getLng();
 
-    // 코멘트 모드 분기
     if (isCommentMode) {
       setIsSheetOpen(false);
       setSelectedOverlay(null);
@@ -185,63 +144,24 @@ const PromiseMap = () => {
     });
   };
 
+  // 이미 마커로 추가된 상태인지 여부
   const isPendingAdded = pendingPlace
     ? markers.some(m => m.placeName === pendingPlace.placeName)
     : false;
-
-  // 마커 추가 및 제거
-  const handleToggleAdd = (isAdded: boolean) => {
-    if (!pendingPlace) return;
-
-    if (isAdded) {
-      setMarkers(prev => {
-        const alreadyExists = prev.some(
-          m => m.placeName === pendingPlace.placeName,
-        );
-        if (alreadyExists) return prev;
-        return [...prev, { ...pendingPlace }];
-      });
-    } else {
-      setMarkers(prev =>
-        prev.filter(m => m.placeName !== pendingPlace.placeName),
-      );
-    }
-  };
-
-  // 투표 토글
-  const handleToggleVote = (voted: boolean) => {
-    if (!pendingPlace) return;
-    const key = placeKey(pendingPlace.lat, pendingPlace.lng);
-
-    if (isMultipleVoting) {
-      setVotedPlaces(prev => {
-        const next = new Set(prev);
-        voted ? next.add(key) : next.delete(key);
-        return next;
-      });
-    } else {
-      setVotedPlace(voted ? key : null);
-    }
-  };
 
   const handleSheetClose = () => {
     setIsSheetOpen(false);
     setPendingPlace(null);
   };
 
-  // 현재 장소 투표 여부
-  const isVoted = pendingPlace
-    ? isMultipleVoting
-      ? votedPlaces.has(placeKey(pendingPlace.lat, pendingPlace.lng))
-      : votedPlace === placeKey(pendingPlace.lat, pendingPlace.lng)
-    : false;
+  const isVoted = getIsVoted(pendingPlace);
+  const isConfirmed = false; // 추후 연동 예정
 
-  const isConfirmed = false;
-
-  // 모바일 오류 해결
+  // 모바일 환경 오류 해결
   const generateId = () =>
     Math.random().toString(36).slice(2) + Date.now().toString(36);
 
+  // 장소 결정하기 버튼 클릭 시 이동
   const handleGoVoteResult = () => {
     navigate(`/map/${promiseId}/vote`, {
       state: {
@@ -341,7 +261,6 @@ const PromiseMap = () => {
                     setOpenCommentId(null);
                   }}
                 >
-                  {/* 상단 프로필 + 이름 */}
                   <div className="flex items-center gap-1 mb-1.5">
                     <img
                       src={MapMemberIcon}
@@ -352,11 +271,9 @@ const PromiseMap = () => {
                       000
                     </span>
                   </div>
-                  {/* 댓글 텍스트 */}
                   <p className="text-[#FFFFFF] text-[0.5rem] font-light leading-2">
                     {comment.text}
                   </p>
-                  {/* 왼쪽 아래 꼬리 */}
                   <div className="absolute -left-2 top-9 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-8 border-t-transparent border-b-transparent border-r-[#2D2D2D]" />
                 </div>
               )}
@@ -440,7 +357,6 @@ const PromiseMap = () => {
       {showToast && isOnline && !isCommentMode && (
         <>
           <div className="fixed inset-x-0 top-0 bottom-24 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50" />
-
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <ToastMessage
               title="장소가 없어요"
@@ -454,7 +370,6 @@ const PromiseMap = () => {
       {!isOnline && (
         <>
           <div className="fixed inset-x-0 top-0 bottom-24 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50" />
-
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <ToastMessage
               title="오프라인 상태입니다"
@@ -488,9 +403,13 @@ const PromiseMap = () => {
           address={selectedPlace.address}
           proposedBy={selectedPlace.proposedBy}
           isAdded={isPendingAdded}
-          onToggleAdd={handleToggleAdd}
+          onToggleAdd={isAdded =>
+            pendingPlace && handleToggleAdd(isAdded, pendingPlace)
+          }
           isVoted={isVoted}
-          onToggleVote={handleToggleVote}
+          onToggleVote={isVotedNext =>
+            pendingPlace && handleToggleVote(isVotedNext, pendingPlace)
+          }
           isConfirmed={isConfirmed}
         />
       )}
