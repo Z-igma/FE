@@ -2,51 +2,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import PromiseCard from './components/PromiseCard';
 import BottomButton from '@/components/common/BottomButton';
+import { formatDate, usePromiseList } from './hooks/usePromiseList';
 import NonePromiseIcon from '@/assets/images/home/nonePromiseIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
 
 const Home = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuthStore();
+  const { activePromises, pastPromises, hasPromise } = usePromiseList();
 
-  const promises = [
-    {
-      id: 1,
-      title: '저녁 모임',
-      planStatus: '진행 중',
-      promisedAt: '2026-05-28T21:26:12',
-      dayOfWeek: '목',
-      memberCount: 3,
-    },
-    {
-      id: 2,
-      title: '영화',
-      planStatus: '확정 완료',
-      promisedAt: '2026-04-25T21:26:12',
-      dayOfWeek: '토',
-      memberCount: 1,
-    },
-  ];
-  const hasPromise = promises.length > 0;
-
-  const now = new Date();
-
-  const activePromises = promises.filter(
-    promise => new Date(promise.promisedAt) >= now,
-  );
-
-  const pastPromises = promises.filter(
-    promise => new Date(promise.promisedAt) < now,
-  );
-
-  const formatDate = (promisedAt: string, dayOfWeek: string) => {
-    const date = new Date(promisedAt);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const time = promisedAt.split('T')[1].slice(0, 5);
-    return `${month}월 ${day}일 (${dayOfWeek}) ${time}`;
-  };
-
+  // 로그인 후 약속 생성 가능
   const handleBottomButton = () => {
     if (!isLoggedIn) {
       navigate('/login');
