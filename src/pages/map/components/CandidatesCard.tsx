@@ -1,6 +1,5 @@
+import type { CardStatus } from '@/types/map';
 import CardMemberIcon from '@/assets/images/cardMemberIcon.svg';
-
-type CardStatus = 'best' | 'tie' | null;
 
 interface CandidatesCardProps {
   isSelectable?: boolean; // 재투표 중 카드 선택 가능 여부
@@ -14,7 +13,7 @@ interface CandidatesCardProps {
   voteMember: string; // 투표한 멤버
   voteCount: number; // 득표 수
   memberCount: number; // 전체 멤버 수
-  hideBadge?: boolean;
+  hideBadge?: boolean; // 배지 숨김 여부
 }
 
 const CandidatesCard = ({
@@ -34,30 +33,30 @@ const CandidatesCard = ({
   return (
     <div
       className={`flex flex-col gap-1.5 pt-4.5 pb-5.5 px-5 rounded-2xl ${
-        // 득표 상태에 따라 배경색 + 선택 시 보더 적용
+        // 득표 상태 및 선택 여부에 따라 배경색 + 보더 적용
         status === 'best'
           ? `bg-[rgba(0,64,142,0.06)] ${isSelected ? 'border border-[#00408E]' : ''}`
           : status === 'tie'
             ? `bg-[rgba(255,152,0,0.10)] ${isSelected ? 'border border-[rgba(255,152,0,0.50)]' : ''}`
             : isSelected
-              ? 'border border-[#00408E] bg-[rgba(0,64,142,0.06)]' // 기본 카드 선택 시
-              : 'border border-[#C6C6C6]' // 기본 카드 미선택
+              ? 'border border-[#00408E] bg-[rgba(0,64,142,0.06)]'
+              : 'border border-[#C6C6C6]'
       } ${isSelectable ? 'cursor-pointer' : ''}`}
       onClick={isSelectable ? onSelect : undefined}
     >
       <div className="flex justify-between items-start">
-        <div className="flex flex-col gap-1">
-          <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7">
+        <div className="flex flex-col gap-1 min-w-0">
+          <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7 truncate">
             {name}
           </p>
-          <p className="text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5">
+          <p className="text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5 truncate">
             📍 {distance}m {address}
           </p>
         </div>
 
         {/* 1위 */}
         {status === 'best' && !hideBadge && (
-          <div className="bg-[#E8F5E9] px-4 py-1.5 rounded-full">
+          <div className="bg-[#E8F5E9] px-4 py-1.5 rounded-full shrink-0">
             <p className="text-[#2E7D32] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               👑 1위
             </p>
@@ -66,7 +65,7 @@ const CandidatesCard = ({
 
         {/* 동점 */}
         {status === 'tie' && !hideBadge && (
-          <div className="bg-[#FF9800] px-4 py-1.5 rounded-full">
+          <div className="bg-[#FF9800] px-4 py-1.5 rounded-full shrink-0">
             <p className="text-[#FFFFFF] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
               동점
             </p>

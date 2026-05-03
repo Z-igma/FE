@@ -18,7 +18,7 @@ const VoteStateBox = ({
       <div className="flex justify-between">
         <div className="flex flex-col gap-1.5">
           <p
-            className={`${isBest ? 'text-[#111111]' : 'text-[#888888]'} font-Pretendard font-semibold text-[1.125rem] leading-6.3`}
+            className={`${isBest ? 'text-[#111111]' : 'text-[#888888]'} font-Pretendard font-semibold text-[1.125rem] leading-6.3 truncate`}
           >
             {name}
           </p>

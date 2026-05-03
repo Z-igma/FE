@@ -1,35 +1,29 @@
 import { useNavigate } from 'react-router-dom';
 import PromiseCard from '@/pages/home/components/PromiseCard';
+import { formatDate } from '@/pages/home/hooks/usePromiseList';
 import NonePromiseIcon from '@/assets/images/home/nonePromiseIcon.svg';
+
+// 교체 예정 약속 데이터
+const mockPromises = [
+  {
+    id: 1,
+    title: '저녁 모임',
+    planStatus: '진행 중',
+    promisedAt: '2026-05-28T21:26:12',
+    dayOfWeek: '목',
+    memberCount: 3,
+  },
+];
 
 const Promise = () => {
   const navigate = useNavigate();
-
-  const promises = [
-    {
-      id: 1,
-      title: '저녁 모임',
-      planStatus: '진행 중',
-      promisedAt: '2026-05-28T21:26:12',
-      dayOfWeek: '목',
-      memberCount: 3,
-    },
-  ];
-
   const now = new Date();
 
-  const upcomingConfirmedPromises = promises.filter(
+  // 확정 완료 + 진행 중 약속
+  const upcomingConfirmedPromises = mockPromises.filter(
     promise =>
       promise.planStatus === '확정 완료' && new Date(promise.promisedAt) >= now,
   );
-
-  const formatDate = (promisedAt: string, dayOfWeek: string) => {
-    const date = new Date(promisedAt);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const time = promisedAt.split('T')[1].slice(0, 5);
-    return `${month}월 ${day}일 (${dayOfWeek}) ${time}`;
-  };
 
   return upcomingConfirmedPromises.length > 0 ? (
     <div className="flex flex-col pt-10 px-4 gap-5">

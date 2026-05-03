@@ -68,8 +68,8 @@ const LocationBottomSheet = ({
       ) : (
         <div className="flex flex-col gap-2">
           <div className="flex justify-between">
-            <div className="flex flex-col gap-0.5">
-              <p className="text-[#111111] font-Pretendard font-semibold text-[1.375rem] leading-7.7">
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <p className="text-[#111111] font-Pretendard font-semibold text-[1.375rem] leading-7.7 truncate">
                 {placeName}
               </p>
               <div className="flex gap-0.5 items-center">
@@ -88,14 +88,16 @@ const LocationBottomSheet = ({
               </div>
             ) : (
               <div className="flex gap-5">
-                <div
-                  className={`w-9 h-9 p-1.5 rounded-full ${
-                    !isAdded ? 'opacity-30' : 'cursor-pointer'
-                  } ${isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
-                  onClick={() => isAdded && onToggleVote(!isVoted)}
-                >
-                  <img src={VoteIcon} />
-                </div>
+                {isAdded && (
+                  <div
+                    className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${
+                      isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'
+                    }`}
+                    onClick={() => onToggleVote(!isVoted)}
+                  >
+                    <img src={VoteIcon} />
+                  </div>
+                )}
                 <div
                   className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#D40004]' : 'bg-[#00408E]'}`}
                   onClick={() => onToggleAdd(!isAdded)}
