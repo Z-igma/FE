@@ -48,8 +48,11 @@ const Map = () => {
   }, []);
 
   return (
-    <div className="w-full h-screen pb-24">
-      <KakaoMap center={center} style={{ width: '100%', height: '100%' }} />
+    <div className="fixed inset-0 overflow-hidden">
+      <KakaoMap
+        center={center}
+        style={{ width: '100%', height: 'calc(100% - 6rem)' }}
+      />
 
       {/* 진행 중인 약속이 없을 때 */}
       {promises.length === 0 && (
