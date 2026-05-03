@@ -12,7 +12,7 @@ type BottomSheetProps = {
 const BottomSheet = ({
   children,
   isOpen,
-  onClose,
+  // onClose,
   peekHeight = 'h-17',
   fullHeight = 'h-90',
   className,
