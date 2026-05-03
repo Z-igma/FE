@@ -9,12 +9,14 @@ const Account = () => {
   const { logout } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [bio, setBio] = useState('한 줄 소개를 적어 주세요!');
-  const [myPromise, setMyPromise] = useState({
+  // const [myPromise, setMyPromise] = useState({
+  const [myPromise] = useState({
     joined: 1,
     created: 1,
   });
 
-  const [userInfo, setUserInfo] = useState({
+  // const [userInfo, setUserInfo] = useState({
+  const [userInfo] = useState({
     name: '지그마',
     email: 'zigma@hansung.ac.kr',
     profileImage: null as string | null,
