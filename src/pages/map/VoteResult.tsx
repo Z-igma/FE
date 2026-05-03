@@ -6,7 +6,7 @@ import Header from '@/components/layout/Header';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 import { useVoteResult } from './hooks/useVoteResult';
 import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
-import FixedBottomLayout from '@/components/layout/FixBottomLayout';
+import FixBottomLayout from '@/components/layout/FixBottomLayout';
 
 const VoteResult = () => {
   const isCreator = true; // 약속 생성자 구분 추가 예정
@@ -19,7 +19,7 @@ const VoteResult = () => {
   const votedPlace: string | null = state?.votedPlace ?? null;
 
   const {
-    displayCandidates,
+    sortedCandidates,
     myVote,
     setMyVote,
     isConfirmModalOpen,
@@ -57,18 +57,18 @@ const VoteResult = () => {
           </div>
 
           {isCreator && (
-            <FixedBottomLayout>
+            <FixBottomLayout>
               <BottomButton
                 text={buttonText}
                 disabled={buttonDisabled}
                 onClick={handleConfirmClick}
               />
-            </FixedBottomLayout>
+            </FixBottomLayout>
           )}
         </div>
 
         <div className="flex flex-col overflow-y-auto max-h-[calc(100vh-260px)] px-4 gap-5 pb-20">
-          {displayCandidates.map(candidate => (
+          {sortedCandidates.map(candidate => (
             <CandidatesCard
               key={candidate.id}
               status={getStatus(candidate.voteCount)}

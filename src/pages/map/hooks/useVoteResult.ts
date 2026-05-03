@@ -57,6 +57,11 @@ export const useVoteResult = ({
     ? candidates.filter(c => c.voteCount === maxVote)
     : candidates;
 
+  // 1위부터 정렬
+  const sortedCandidates = [...displayCandidates].sort(
+    (a, b) => b.voteCount - a.voteCount,
+  );
+
   // 현재 상태에 따른 버튼 텍스트
   const buttonText = isRevoteTie
     ? '임의로 장소 확정하기'
@@ -84,7 +89,7 @@ export const useVoteResult = ({
 
   return {
     candidates,
-    displayCandidates,
+    sortedCandidates,
     isTie,
     isRevote,
     myVote,
