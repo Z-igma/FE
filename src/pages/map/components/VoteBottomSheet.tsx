@@ -1,7 +1,6 @@
+import VoteStateBox from './VoteStateBox';
 import BottomButton from '@/components/common/BottomButton';
 import BottomSheet from '@/components/common/BottomSheet';
-import { useNavigate } from 'react-router-dom';
-import VoteStateBox from './VoteStateBox';
 
 interface VoteBottomSheetProps {
   isOpen: boolean;
@@ -9,26 +8,38 @@ interface VoteBottomSheetProps {
   count: number;
   promiseId: string | undefined;
   promise: any;
+  onGoResult: () => void;
+  markers: Marker[];
+  votedPlaces: string[];
+  votedPlace: string | null;
+}
+
+interface Marker {
+  lat: number;
+  lng: number;
+  placeName: string;
+  address: string;
 }
 
 const VoteBottomSheet = ({
   isOpen,
   onClose,
   count,
-  promiseId,
   promise,
+  onGoResult,
+  markers,
+  votedPlaces,
+  votedPlace,
 }: VoteBottomSheetProps) => {
-  const navigate = useNavigate();
-  const candidates = [
-    {
-      id: 1,
-      name: '이태원 파스타 집',
-      distance: '120',
-      vote: 4,
-      isBest: true,
-    },
-    { id: 2, name: '스시 오마카세', distance: '340', vote: 1, isBest: false },
-  ];
+  const getVoteCount = (marker: Marker) => {
+    const key = `${marker.lat}_${marker.lng}`;
+    if (promise?.isMultipleVoting) {
+      return votedPlaces.filter(k => k === key).length;
+    }
+    return votedPlace === key ? 1 : 0;
+  };
+
+  const maxVote = Math.max(...markers.map(m => getVoteCount(m)), 0);
 
   return (
     <BottomSheet
@@ -42,24 +53,20 @@ const VoteBottomSheet = ({
       </p>
       <div className="flex flex-col overflow-y-auto min-h-45 max-h-45 gap-2.5">
         {/* 투표 내용 임시 */}
-        {candidates.map(candidate => (
-          <VoteStateBox
-            key={candidate.id}
-            isBest={candidate.isBest}
-            name={candidate.name}
-            distance={candidate.distance}
-            vote={candidate.vote}
-          />
-        ))}
-        <VoteStateBox name="이태원 파스타 집" distance="120m" vote={1} />
+        {markers.map((marker, i) => {
+          const vote = getVoteCount(marker);
+          return (
+            <VoteStateBox
+              key={i}
+              isBest={vote === maxVote && maxVote > 0}
+              name={marker.placeName}
+              distance={marker.address}
+              vote={vote}
+            />
+          );
+        })}
       </div>
-      <BottomButton
-        text="장소 결정하기"
-        textSize="1rem"
-        onClick={() =>
-          navigate(`/map/${promiseId}/vote`, { state: { promise } })
-        }
-      />
+      <BottomButton text="장소 결정하기" textSize="1rem" onClick={onGoResult} />
     </BottomSheet>
   );
 };

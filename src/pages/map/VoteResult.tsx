@@ -7,42 +7,52 @@ import Header from '@/components/layout/Header';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
 
-const VoteResult = () => {
-  const candidates = [
-    {
-      id: 1,
-      name: '이태원 파스타 집',
-      distance: 120,
-      address: '서울 마포구 홍대입구',
-      createMember: '수아',
-      voteMember: '지민 현우 민준',
-      voteCount: 3,
-    },
-    {
-      id: 2,
-      name: '스시 오마카세',
-      distance: 340,
-      address: '서울 강남 서초동 123-45',
-      createMember: '지민',
-      voteMember: '현준 예준',
-      voteCount: 1,
-    },
-    {
-      id: 3,
-      name: '루프탑 바',
-      distance: 340,
-      address: '서울 홍대 입구역',
-      createMember: '지민',
-      voteMember: '',
-      voteCount: 1,
-    },
-  ];
+interface Marker {
+  lat: number;
+  lng: number;
+  placeName: string;
+  address: string;
+}
 
+interface Candidate {
+  id: number;
+  name: string;
+  distance: number;
+  address: string;
+  createMember: string;
+  voteMember: string;
+  voteCount: number;
+}
+
+const VoteResult = () => {
   const isCreator = true; // 약속 생성자 구분 추가 예정
 
   const navigate = useNavigate();
+
   const { state } = useLocation();
   const promise = state?.promise;
+
+  const markers: Marker[] = state?.markers ?? [];
+  const votedPlaces: string[] = state?.votedPlaces ?? [];
+  const votedPlace: string | null = state?.votedPlace ?? null;
+
+  const getVoteCount = (marker: (typeof markers)[0]) => {
+    const key = `${marker.lat}_${marker.lng}`;
+    if (promise?.isMultipleVoting) {
+      return votedPlaces.filter(k => k === key).length;
+    }
+    return votedPlace === key ? 1 : 0;
+  };
+
+  const candidates = markers.map((marker, index) => ({
+    id: index,
+    name: marker.placeName,
+    distance: 0,
+    address: marker.address,
+    createMember: '나',
+    voteMember: '',
+    voteCount: getVoteCount(marker),
+  }));
 
   // 투표 결과 계산
   const hasVote = candidates.some(c => c.voteCount > 0); // 투표가 하나라도 있는지
@@ -78,9 +88,8 @@ const VoteResult = () => {
   const buttonDisabled = isRevote ? false : !hasVote;
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmedCandidate, setConfirmedCandidate] = useState<
-    (typeof candidates)[0] | null
-  >(null); // 확정 모달에 넘길 후보지
+  const [confirmedCandidate, setConfirmedCandidate] =
+    useState<Candidate | null>(null); // 확정 모달에 넘길 후보지
 
   return (
     <div className="flex flex-col gap-3">

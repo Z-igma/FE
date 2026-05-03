@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   CustomOverlayMap,
   Map,
@@ -43,6 +43,7 @@ interface Comment {
 }
 
 const PromiseMap = () => {
+  const navigate = useNavigate();
   const { state } = useLocation();
   const { promiseId } = useParams();
   const promise = state?.promise;
@@ -150,6 +151,7 @@ const PromiseMap = () => {
     mouseEvent: kakao.maps.event.MouseEvent,
   ) => {
     if (openCommentId) return;
+    if (selectedOverlay) return;
 
     const lat = mouseEvent.latLng.getLat();
     const lng = mouseEvent.latLng.getLng();
@@ -239,6 +241,17 @@ const PromiseMap = () => {
   // 모바일 오류 해결
   const generateId = () =>
     Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+  const handleGoVoteResult = () => {
+    navigate(`/map/${promiseId}/vote`, {
+      state: {
+        promise,
+        markers,
+        votedPlaces: [...votedPlaces],
+        votedPlace,
+      },
+    });
+  };
 
   return (
     <div className="relative w-full h-screen pb-24 overflow-hidden">
@@ -456,9 +469,13 @@ const PromiseMap = () => {
         <VoteBottomSheet
           isOpen={!isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          count={2}
+          count={markers.length}
           promiseId={promiseId}
           promise={promise}
+          onGoResult={handleGoVoteResult}
+          markers={markers}
+          votedPlaces={[...votedPlaces]}
+          votedPlace={votedPlace}
         />
       )}
 
