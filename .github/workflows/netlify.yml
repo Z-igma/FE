@@ -34,6 +34,7 @@ jobs:
     needs: build # 빌드 작업이 성공적으로 끝나야 실행
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Download build artifact # 빌드 후 업로드한 dist artifact 다운
         uses: actions/download-artifact@v4
