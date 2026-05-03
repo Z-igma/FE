@@ -18,7 +18,7 @@ import { useComment } from './hooks/useComment';
 import type { Comment } from '@/types/map';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
-import ChatIcon from '@/assets/images/map/chatIcon.svg';
+import CommentIcon from '@/assets/images/map/commentIcon.svg';
 
 const PromiseMap = () => {
   const navigate = useNavigate();
@@ -41,15 +41,15 @@ const PromiseMap = () => {
   const {
     isCommentMode,
     setIsCommentMode,
-    isChatOpen,
-    setIsChatOpen,
+    isCommentOpen,
+    setIsCommentOpen,
     commentLatLng,
     setCommentLatLng,
     comments,
     openCommentId,
     setOpenCommentId,
     handleCommentSubmit,
-    handleChatClose,
+    handleCommentClose,
   } = useComment();
 
   const {
@@ -66,7 +66,7 @@ const PromiseMap = () => {
     isCommentMode,
     setIsCommentMode,
     setCommentLatLng,
-    setIsChatOpen,
+    setIsCommentOpen,
     openCommentId,
   });
 
@@ -229,7 +229,7 @@ const PromiseMap = () => {
       </div>
 
       {/* 채팅 버튼 */}
-      {!isSheetOpen && !isChatOpen && (
+      {!isSheetOpen && !isCommentOpen && (
         <div
           className={`absolute right-6 z-50 ${markers.length > 0 ? 'bottom-48' : 'bottom-35'}`}
           onClick={() => {
@@ -241,15 +241,15 @@ const PromiseMap = () => {
           <div
             className={`flex pl-3 pt-3 pr-3.5 pb-3.5 w-15 h-15 rounded-full transition-colors ${isCommentMode ? 'bg-[#FF6B35]' : 'bg-[#00408E]'}`}
           >
-            <img src={ChatIcon} />
+            <img src={CommentIcon} />
           </div>
         </div>
       )}
 
-      {isChatOpen && (
+      {isCommentOpen && (
         <CommentBottomSheet
-          isOpen={isChatOpen}
-          onClose={handleChatClose}
+          isOpen={isCommentOpen}
+          onClose={handleCommentClose}
           latLng={commentLatLng}
           onSubmit={handleCommentSubmit}
         />
@@ -282,7 +282,7 @@ const PromiseMap = () => {
       )}
 
       {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}
-      {markers.length > 0 && !isCommentMode && !isChatOpen && (
+      {markers.length > 0 && !isCommentMode && !isCommentOpen && (
         <VoteBottomSheet
           isOpen={!isSheetOpen}
           onClose={() => setIsSheetOpen(false)}

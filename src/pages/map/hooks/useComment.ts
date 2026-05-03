@@ -8,7 +8,7 @@ const generateId = () =>
 // 코멘트 모드 토글, 코멘트 목록, 채팅 바텀 시트 상태 관리
 export const useComment = () => {
   const [isCommentMode, setIsCommentMode] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [commentLatLng, setCommentLatLng] = useState<{
     lat: number;
     lng: number;
@@ -25,22 +25,22 @@ export const useComment = () => {
   };
 
   // 채팅 바텀 시트 닫기 + 좌표 초기화
-  const handleChatClose = () => {
-    setIsChatOpen(false);
+  const handleCommentClose = () => {
+    setIsCommentOpen(false);
     setCommentLatLng(null);
   };
 
   return {
     isCommentMode,
     setIsCommentMode,
-    isChatOpen,
-    setIsChatOpen,
+    isCommentOpen,
+    setIsCommentOpen,
     commentLatLng,
     setCommentLatLng,
     comments,
     openCommentId,
     setOpenCommentId,
     handleCommentSubmit,
-    handleChatClose,
+    handleCommentClose,
   };
 };

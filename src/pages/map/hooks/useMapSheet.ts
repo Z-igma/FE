@@ -12,7 +12,7 @@ interface UseMapSheetProps {
   isCommentMode: boolean;
   setIsCommentMode: (v: boolean) => void;
   setCommentLatLng: (v: { lat: number; lng: number } | null) => void;
-  setIsChatOpen: (v: boolean) => void;
+  setIsCommentOpen: (v: boolean) => void;
   openCommentId: string | null;
 }
 
@@ -21,7 +21,7 @@ export const useMapSheet = ({
   isCommentMode,
   setIsCommentMode,
   setCommentLatLng,
-  setIsChatOpen,
+  setIsCommentOpen,
   openCommentId,
 }: UseMapSheetProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -80,7 +80,7 @@ export const useMapSheet = ({
       setIsSheetOpen(false);
       setSelectedOverlay(null);
       setCommentLatLng({ lat, lng });
-      setIsChatOpen(true);
+      setIsCommentOpen(true);
       setIsCommentMode(false);
       return;
     }
