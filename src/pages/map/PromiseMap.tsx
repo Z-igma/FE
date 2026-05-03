@@ -455,7 +455,7 @@ const PromiseMap = () => {
         <>
           <div className="fixed inset-x-0 top-0 bottom-24 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50" />
 
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <ToastMessage
               title="오프라인 상태입니다"
               subTitle="장소를 추가할 수 없어요"
