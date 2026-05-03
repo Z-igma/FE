@@ -13,18 +13,12 @@ import LocationMarker from './components/LocationMarker';
 import ToastMessage from '@/components/common/ToastMessage';
 import { useMapLocation } from './hooks/useMapLocation';
 import { useVoteState } from './hooks/useVoteState';
-import type { Marker, SelectedPlace, Comment } from '@/types/map';
+import { useMapSheet } from './hooks/useMapSheet';
+import { useComment } from './hooks/useComment';
+import type { Comment } from '@/types/map';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import ChatIcon from '@/assets/images/map/chatIcon.svg';
-
-/** 카카오 장소 검색 카테고리 코드 */
-const CATEGORIES = [
-  'FD6', // 음식점
-  'CE7', // 카페
-  'CT1', // 문화 시설
-  'AT4', // 관광 명소
-];
 
 const PromiseMap = () => {
   const navigate = useNavigate();
@@ -44,23 +38,37 @@ const PromiseMap = () => {
     getIsVoted,
   } = useVoteState({ isMultipleVoting });
 
-  // 바텀 시트 관련 상태
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<SelectedPlace | null>(
-    null,
-  );
-  const [pendingPlace, setPendingPlace] = useState<Marker | null>(null);
-  const [selectedOverlay, setSelectedOverlay] = useState<Marker | null>(null);
+  const {
+    isCommentMode,
+    setIsCommentMode,
+    isChatOpen,
+    setIsChatOpen,
+    commentLatLng,
+    setCommentLatLng,
+    comments,
+    openCommentId,
+    setOpenCommentId,
+    handleCommentSubmit,
+    handleChatClose,
+  } = useComment();
 
-  // 코멘트 관련 상태
-  const [isCommentMode, setIsCommentMode] = useState(false);
-  const [commentLatLng, setCommentLatLng] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [openCommentId, setOpenCommentId] = useState<string | null>(null);
+  const {
+    isSheetOpen,
+    setIsSheetOpen,
+    selectedPlace,
+    pendingPlace,
+    selectedOverlay,
+    setSelectedOverlay,
+    handleMapClick,
+    handleSheetClose,
+    handleOverlayOpen,
+  } = useMapSheet({
+    isCommentMode,
+    setIsCommentMode,
+    setCommentLatLng,
+    setIsChatOpen,
+    openCommentId,
+  });
 
   const [showToast, setShowToast] = useState(true);
 
@@ -71,105 +79,16 @@ const PromiseMap = () => {
 
   if (!promise) return null;
 
-  // 클릭 좌표 반경 50m 내 가장 가까운 장소명 조회
-  const findNearestPlace = (
-    lat: number,
-    lng: number,
-    callback: (placeName: string) => void,
-  ) => {
-    const places = new kakao.maps.services.Places();
-    const location = new kakao.maps.LatLng(lat, lng);
-    const results: kakao.maps.services.PlacesSearchResult = [];
-    let completed = 0;
-
-    CATEGORIES.forEach(category => {
-      places.categorySearch(
-        category as any,
-        (result, status) => {
-          if (status === kakao.maps.services.Status.OK) {
-            results.push(...result);
-          }
-          completed++;
-
-          if (completed === CATEGORIES.length) {
-            if (results.length === 0) {
-              callback('선택한 위치');
-              return;
-            }
-            results.sort((a, b) => Number(a.distance) - Number(b.distance));
-            callback(results[0].place_name);
-          }
-        },
-        { location, radius: 50, sort: kakao.maps.services.SortBy.DISTANCE },
-      );
-    });
-  };
-
-  // 지도 클릭 시 장소 조회 후 바텀 시트 표시
-  const handleMapClick = (
-    _: kakao.maps.Map,
-    mouseEvent: kakao.maps.event.MouseEvent,
-  ) => {
-    if (openCommentId) return;
-    if (selectedOverlay) return;
-
-    const lat = mouseEvent.latLng.getLat();
-    const lng = mouseEvent.latLng.getLng();
-
-    if (isCommentMode) {
-      setIsSheetOpen(false);
-      setSelectedOverlay(null);
-      setCommentLatLng({ lat, lng });
-      setIsChatOpen(true);
-      setIsCommentMode(false);
-      return;
-    }
-
-    setSelectedOverlay(null);
-    if (isSheetOpen) {
-      setIsSheetOpen(false);
-      return;
-    }
-
-    const geocoder = new kakao.maps.services.Geocoder();
-    geocoder.coord2Address(lng, lat, (result, status) => {
-      if (status !== kakao.maps.services.Status.OK) return;
-      const address =
-        result[0].road_address?.address_name ?? result[0].address.address_name;
-      findNearestPlace(lat, lng, placeName => {
-        setPendingPlace({ lat, lng, placeName, address });
-        setSelectedPlace({ placeName, address, proposedBy: '나' });
-        setIsSheetOpen(true);
-      });
-    });
-  };
-
-  // 이미 마커로 추가된 상태인지 여부
   const isPendingAdded = pendingPlace
     ? markers.some(m => m.placeName === pendingPlace.placeName)
     : false;
 
-  const handleSheetClose = () => {
-    setIsSheetOpen(false);
-    setPendingPlace(null);
-  };
-
   const isVoted = getIsVoted(pendingPlace);
-  const isConfirmed = false; // 추후 연동 예정
+  const isConfirmed = false; // 확정된 장소 예정
 
-  // 모바일 환경 오류 해결
-  const generateId = () =>
-    Math.random().toString(36).slice(2) + Date.now().toString(36);
-
-  // 장소 결정하기 버튼 클릭 시 이동
   const handleGoVoteResult = () => {
     navigate(`/map/${promiseId}/vote`, {
-      state: {
-        promise,
-        markers,
-        votedPlaces: [...votedPlaces],
-        votedPlace,
-      },
+      state: { promise, markers, votedPlaces: [...votedPlaces], votedPlace },
     });
   };
 
@@ -227,16 +146,7 @@ const PromiseMap = () => {
                   >
                     <LocationMarker
                       name={marker.placeName}
-                      onClick={() => {
-                        setPendingPlace(marker);
-                        setSelectedPlace({
-                          placeName: marker.placeName,
-                          address: marker.address,
-                          proposedBy: '나',
-                        });
-                        setIsSheetOpen(true);
-                        setSelectedOverlay(null);
-                      }}
+                      onClick={() => handleOverlayOpen(marker)}
                     />
                   </CustomOverlayMap>
                 )}
@@ -244,8 +154,8 @@ const PromiseMap = () => {
           ))}
         </MarkerClusterer>
 
-        {/* 등록된 코멘트 핀 */}
-        {comments.map(comment => (
+        {/* 등록된 코멘트 */}
+        {comments.map((comment: Comment) => (
           <CustomOverlayMap
             key={comment.id}
             position={{ lat: comment.lat, lng: comment.lng }}
@@ -339,17 +249,9 @@ const PromiseMap = () => {
       {isChatOpen && (
         <CommentBottomSheet
           isOpen={isChatOpen}
-          onClose={() => {
-            setIsChatOpen(false);
-            setCommentLatLng(null);
-          }}
+          onClose={handleChatClose}
           latLng={commentLatLng}
-          onSubmit={(text, latLng) => {
-            setComments(prev => [
-              ...prev,
-              { id: generateId(), ...latLng, text },
-            ]);
-          }}
+          onSubmit={handleCommentSubmit}
         />
       )}
 
