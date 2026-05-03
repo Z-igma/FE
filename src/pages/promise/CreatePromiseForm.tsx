@@ -1,60 +1,37 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CreatePromiseTitle from './components/CreatePromiseTitle';
 import DatePickerCalendar from './components/DatePickerCalendar';
-import TimeScrollSelector, {
-  type TimeIndex,
-} from './components/TimeScrollSelector';
+import TimeScrollSelector from './components/TimeScrollSelector';
 import Header from '@/components/layout/Header';
-import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 import BottomButton from '@/components/common/BottomButton';
-
-const TOPICS = ['식사', '카페', '영화', '액티비티', '스터디', '파티'];
-
-const getNowIndex = (): TimeIndex => {
-  const now = new Date();
-  const hours12 = now.getHours() % 12;
-  return {
-    ap: now.getHours() >= 12 ? 1 : 0,
-    hr: hours12 === 0 ? 11 : hours12 - 1,
-    mn: now.getMinutes(),
-  };
-};
+import { formatDateLabel, useCreatePromise } from './hooks/useCreatePromise';
+import { CATEGORIES } from './constants/promise';
+import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 
 const CreatePromiseForm = () => {
   const navigate = useNavigate();
-
-  const [promiseName, setPromiseName] = useState('');
-  const [isDateOpen, setIsDateOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [isTimeOpen, setIsTimeOpen] = useState(false);
-  const [timeIndex, setTimeIndex] = useState<TimeIndex>(getNowIndex); // 지금 시간을 기본 값으로 설정
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [isMultiVote, setIsMultiVote] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const [showErrors, setShowErrors] = useState({
-    promiseName: false,
-    date: false,
-    time: false,
-    category: false,
-  });
-
-  const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
-
-  // 날짜 표시 포맷 함수
-  const formatDate = (date: Date) => {
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const dayOfWeek = DAYS[date.getDay()];
-    return `${month}월 ${day}일 (${dayOfWeek})`;
-  };
-
-  const isValid =
-    promiseName.trim() !== '' &&
-    !!selectedDate &&
-    !!selectedTime &&
-    !!selectedCategory;
+  const {
+    promiseName,
+    setPromiseName,
+    isDateOpen,
+    setIsDateOpen,
+    selectedDate,
+    setSelectedDate,
+    isTimeOpen,
+    setIsTimeOpen,
+    timeIndex,
+    setTimeIndex,
+    selectedTime,
+    setSelectedTime,
+    isMultiVote,
+    setIsMultiVote,
+    selectedCategory,
+    setSelectedCategory,
+    showErrors,
+    setShowErrors,
+    showAllErrors,
+    isValid,
+  } = useCreatePromise();
 
   const handleSubmit = () => {
     navigate('/home');
@@ -89,8 +66,8 @@ const CreatePromiseForm = () => {
               (showErrors.time && !selectedTime)
             }
           />
-          {/* 날짜 선택 드롭다운 */}
           <div className="flex gap-4">
+            {/* 날짜 선택 드롭다운 */}
             <div
               onClick={() => {
                 setShowErrors(prev => ({ ...prev, promiseName: true }));
@@ -109,7 +86,7 @@ const CreatePromiseForm = () => {
                 }`}
               >
                 {selectedDate
-                  ? formatDate(selectedDate)
+                  ? formatDateLabel(selectedDate)
                   : '날짜를 선택해 주세요'}
               </p>
               <img
@@ -149,7 +126,6 @@ const CreatePromiseForm = () => {
           </div>
           {isDateOpen && (
             <div className="px-10.5 mt-3 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
-              {/* 날짜 선택 캘린더 */}
               <DatePickerCalendar
                 selectedDate={selectedDate}
                 setSelectedDate={date => {
@@ -161,7 +137,6 @@ const CreatePromiseForm = () => {
           )}
           {isTimeOpen && (
             <div className="mt-1 mb-5 bg-[rgba(224, 224, 224, 0.50)]">
-              {/* 시간 선택 */}
               <TimeScrollSelector
                 initialIndex={timeIndex}
                 onChange={(time, index) => {
@@ -179,7 +154,7 @@ const CreatePromiseForm = () => {
             error={showErrors.category && !selectedCategory}
           />
           <div className="grid grid-cols-3 gap-2.5">
-            {TOPICS.map(category => (
+            {CATEGORIES.map(category => (
               <div
                 key={category}
                 onClick={() => {
@@ -197,7 +172,7 @@ const CreatePromiseForm = () => {
                 className={`flex justify-center items-center py-3.75 border border-[#C6C6C6] rounded-[10px] cursor-pointer ${
                   selectedCategory === category
                     ? 'bg-[#00408E]'
-                    : 'bg-[#FAFAFA] '
+                    : 'bg-[#FAFAFA]'
                 }`}
               >
                 <p
@@ -217,14 +192,7 @@ const CreatePromiseForm = () => {
         <div className="flex justify-between items-center">
           <CreatePromiseTitle title="참여자 초대" />
           <button
-            onClick={() => {
-              setShowErrors({
-                promiseName: true,
-                date: true,
-                time: true,
-                category: true,
-              });
-            }}
+            onClick={showAllErrors}
             className="py-1 px-4 border bg-[#FAFAFA] border-[#C6C6C6] rounded-[10px] active:bg-[#00408E]"
           >
             <p className="text-[0.875rem] font-Pretendard text-[#C6C6C6] font-light leading-5 active:text-[#FFFFFF]">
@@ -237,12 +205,7 @@ const CreatePromiseForm = () => {
           <CreatePromiseTitle title="장소 복수 투표" />
           <div
             onClick={() => {
-              setShowErrors({
-                promiseName: true,
-                date: true,
-                time: true,
-                category: true,
-              });
+              showAllErrors();
               setIsMultiVote(!isMultiVote);
             }}
             className={`w-13.5 h-7.5 px-1.25 py-1.5 border rounded-4xl cursor-pointer transition-colors border-[#C6C6C6] ${isMultiVote ? 'bg-[#00408E]' : 'bg-[#FAFAFA]'}`}
