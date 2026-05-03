@@ -239,7 +239,7 @@ const PromiseMap = () => {
           }}
         >
           <div
-            className={`flex pl-3 pt-3 pr-3.5 pb-3.5 w-15 h-15 rounded-full transition-colors ${isCommentMode ? 'bg-[#FF6B35]' : 'bg-[#00408E]'}`}
+            className={`flex pl-3 pt-3 pr-3.5 pb-3.5 w-15 h-15 rounded-full transition-colors ${isCommentMode ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'}`}
           >
             <img src={CommentIcon} />
           </div>
