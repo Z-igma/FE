@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import PromiseCard from './components/PromiseCard';
 import BottomButton from '@/components/common/BottomButton';
-import FixedBottomLayout from '@/components/layout/FixBottomLayout';
+import FixBottomLayout from '@/components/layout/FixBottomLayout';
 import { formatDate, usePromiseList } from './hooks/usePromiseList';
 import NonePromiseIcon from '@/assets/images/home/nonePromiseIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
@@ -72,13 +72,13 @@ const Home = () => {
         </div>
       </div>
 
-      <FixedBottomLayout>
+      <FixBottomLayout>
         <BottomButton
           icon={<img src={PlusIcon} />}
           text="새 약속 만들기"
           onClick={handleBottomButton}
         />
-      </FixedBottomLayout>
+      </FixBottomLayout>
     </div>
   ) : (
     <div className="pt-8 px-4">
@@ -96,13 +96,13 @@ const Home = () => {
           </p>
         </div>
       </div>
-      <FixedBottomLayout>
+      <FixBottomLayout>
         <BottomButton
           icon={<img src={PlusIcon} />}
           text="첫 약속 만들기"
           onClick={handleBottomButton}
         />
-      </FixedBottomLayout>
+      </FixBottomLayout>
     </div>
   );
 };
