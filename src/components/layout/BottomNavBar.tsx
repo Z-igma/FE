@@ -41,10 +41,9 @@ const BottomNavBar = () => {
   const { pathname } = useLocation();
   const { isLoggedIn } = useAuthStore();
 
-  // 비로그인 시 기본 지도 및 홈 화면만 접근 가능
+  // 비로그인 시 지도 및 홈만 접근 가능
   const handleTabClick = (path: string) => {
     if (activeTab === path) return;
-
     if (!isLoggedIn && path !== '/map' && path !== '/home') {
       navigate('/login');
       return;
@@ -65,7 +64,7 @@ const BottomNavBar = () => {
   const activeTab = getActiveTab(pathname);
 
   return (
-    <nav className="flex justify-between items-center fixed bottom-1 w-full max-w-[393px] px-9.5 py-3.75 bg-[#FFFFFF] shadow-[0_4px_20px_0_rgba(17,17,17,0.04)] rounded-t-[20px] left-1/2 -translate-x-1/2">
+    <nav className="flex justify-between items-center fixed bottom-1 w-full px-9.5 py-3.75 bg-[#FFFFFF] shadow-[0_4px_20px_0_rgba(17,17,17,0.04)] rounded-t-[20px]">
       {tabs.map(({ path, label, defaultIcon, activeIcon }) => (
         <button
           key={path}

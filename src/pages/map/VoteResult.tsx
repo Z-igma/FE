@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 import { useVoteResult } from './hooks/useVoteResult';
 import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
+import FixedBottomLayout from '@/components/layout/FixBottomLayout';
 
 const VoteResult = () => {
   const isCreator = true; // 약속 생성자 구분 추가 예정
@@ -56,13 +57,13 @@ const VoteResult = () => {
           </div>
 
           {isCreator && (
-            <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
+            <FixedBottomLayout>
               <BottomButton
                 text={buttonText}
                 disabled={buttonDisabled}
                 onClick={handleConfirmClick}
               />
-            </div>
+            </FixedBottomLayout>
           )}
         </div>
 

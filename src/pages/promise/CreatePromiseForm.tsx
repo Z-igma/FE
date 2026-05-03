@@ -7,6 +7,7 @@ import BottomButton from '@/components/common/BottomButton';
 import { formatDateLabel, useCreatePromise } from './hooks/useCreatePromise';
 import { CATEGORIES } from './constants/promise';
 import DropdownIcon from '@/assets/images/dropdownIcon.svg';
+import FixedBottomLayout from '@/components/layout/FixBottomLayout';
 
 const CreatePromiseForm = () => {
   const navigate = useNavigate();
@@ -217,13 +218,13 @@ const CreatePromiseForm = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-30 px-4 left-1/2 -translate-x-1/2 w-[calc(100%-32px)]">
+      <FixedBottomLayout>
         <BottomButton
           text="만들기"
           disabled={!isValid}
           onClick={handleSubmit}
         />
-      </div>
+      </FixedBottomLayout>
     </div>
   );
 };
