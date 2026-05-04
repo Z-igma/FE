@@ -34,9 +34,9 @@ const Account = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen gap-5">
+    <div className="flex flex-col gap-5 overflow-y-auto">
       <Header title="내 정보" rightIcon={SettingIcon} />
-      <div className="flex flex-col flex-1 px-4 justify-between pb-29">
+      <div className="flex flex-col flex-1 px-4 justify-between pb-24 min-h-[calc(100vh-8rem)]">
         <div className="flex flex-col bg-[#E2EAF3] p-4 rounded-2xl gap-4">
           <div className="flex justify-between">
             <div className="flex items-center gap-4">

@@ -39,9 +39,9 @@ const CreatePromiseForm = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <Header title="새 약속 만들기" />
-      <div className="flex flex-col pt-5 px-4 gap-5">
+      <div className="flex flex-col pt-5 px-4 gap-5 overflow-y-auto pb-50">
         <div className="flex flex-col gap-2">
           <CreatePromiseTitle
             title="약속명"
