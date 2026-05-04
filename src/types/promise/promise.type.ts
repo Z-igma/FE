@@ -11,8 +11,22 @@ export interface CreatePromiseRequest {
 export interface PromiseItem {
   id: number;
   title: string;
-  planStatus: string;
+  promiseStatus: string;
   promisedAt: string;
   dayOfWeek: string;
   memberCount: number;
+}
+
+// 약속 목록 조회 요청 파라미터
+export interface GetPromisesParams {
+  cursor?: string;
+  size?: number;
+}
+
+// 약속 목록 조회 응답 데이터
+export interface PromiseListData {
+  promises: PromiseItem[];
+  cursor: string;
+  count: number;
+  hasNext: boolean;
 }
