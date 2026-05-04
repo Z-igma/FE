@@ -10,7 +10,7 @@ const promises = [
   {
     id: 1,
     title: '저녁약속',
-    planStatus: '장소 미정',
+    promiseStatus: '장소 미정',
     promisedAt: '2026-05-28T21:26:12',
     dayOfWeek: '목',
     memberCount: 1,
@@ -18,7 +18,7 @@ const promises = [
   {
     id: 2,
     title: '저녁약속',
-    planStatus: '장소 미정',
+    promiseStatus: '장소 미정',
     promisedAt: '2026-05-28T21:26:12',
     dayOfWeek: '목',
     memberCount: 1,

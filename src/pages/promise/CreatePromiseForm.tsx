@@ -8,6 +8,8 @@ import { formatDateLabel, useCreatePromise } from './hooks/useCreatePromise';
 import { CATEGORIES } from './constants/promise';
 import DropdownIcon from '@/assets/images/dropdownIcon.svg';
 import FixBottomLayout from '@/components/layout/FixBottomLayout';
+import { useCreatePromiseMutation } from './services/useCreatePromiseMutation';
+import { formatDateToISO, parseTimeLabel } from '@/utils/formatDateTime';
 
 const CreatePromiseForm = () => {
   const navigate = useNavigate();
@@ -33,9 +35,22 @@ const CreatePromiseForm = () => {
     showAllErrors,
     isValid,
   } = useCreatePromise();
+  const { mutate, isPending } = useCreatePromiseMutation();
 
   const handleSubmit = () => {
-    navigate('/home');
+    const promisedAt = `${formatDateToISO(selectedDate!)}T${parseTimeLabel(selectedTime!)}`;
+
+    mutate(
+      {
+        title: promiseName,
+        promisedAt,
+        category: selectedCategory!,
+        isMultipleVoting: isMultiVote,
+      },
+      {
+        onSuccess: res => navigate(`/home`),
+      },
+    );
   };
 
   return (

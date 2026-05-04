@@ -1,22 +1,4 @@
-// 교체 예정 임시 데이터
-const mockPromises = [
-  {
-    id: 1,
-    title: '저녁 모임',
-    planStatus: '진행 중',
-    promisedAt: '2026-05-28T21:26:12',
-    dayOfWeek: '목',
-    memberCount: 3,
-  },
-  {
-    id: 2,
-    title: '영화',
-    planStatus: '확정 완료',
-    promisedAt: '2026-04-25T21:26:12',
-    dayOfWeek: '토',
-    memberCount: 1,
-  },
-];
+import { usePromises } from '../services/usePromises';
 
 // 약속 날짜 형식 변환
 export const formatDate = (promisedAt: string, dayOfWeek: string) => {
@@ -29,8 +11,10 @@ export const formatDate = (promisedAt: string, dayOfWeek: string) => {
 
 // 약속 목록 진행 중 / 지난 약속 분류 반환
 export const usePromiseList = () => {
-  const promises = mockPromises;
+  const { data, isLoading } = usePromises();
   const now = new Date();
+
+  const promises = data?.data.promises ?? [];
 
   // 현재 시각 이후 약속
   const activePromises = promises.filter(
@@ -47,5 +31,6 @@ export const usePromiseList = () => {
     activePromises,
     pastPromises,
     hasPromise: promises.length > 0,
+    isLoading,
   };
 };

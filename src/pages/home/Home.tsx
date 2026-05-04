@@ -10,7 +10,8 @@ import PlusIcon from '@/assets/images/plusIcon.svg';
 const Home = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuthStore();
-  const { activePromises, pastPromises, hasPromise } = usePromiseList();
+  const { activePromises, pastPromises, hasPromise, isLoading } =
+    usePromiseList();
 
   // 로그인 후 약속 생성 가능
   const handleBottomButton = () => {
@@ -40,7 +41,7 @@ const Home = () => {
           {activePromises.map(promise => (
             <PromiseCard
               key={promise.id}
-              planStatus={promise.planStatus}
+              promiseStatus={promise.promiseStatus}
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
@@ -60,7 +61,7 @@ const Home = () => {
           {pastPromises.map(promise => (
             <PromiseCard
               key={promise.id}
-              planStatus={promise.planStatus}
+              promiseStatus={promise.promiseStatus}
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
