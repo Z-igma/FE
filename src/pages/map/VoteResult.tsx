@@ -53,7 +53,7 @@ const VoteResult = () => {
             </div>
           </div>
           <div>
-            <PromiseStatusBadge status={promise.planStatus} />
+            <PromiseStatusBadge status={promise.promiseStatus} />
           </div>
 
           {isCreator && (

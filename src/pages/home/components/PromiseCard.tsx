@@ -4,7 +4,7 @@ import MemberInvitePlusIcon from '@/assets/images/home/memberInvitePlusIcon.svg'
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 
 interface PromiseCardProps {
-  planStatus: string;
+  promiseStatus: string;
   title: string;
   date: string;
   memberCount: number;
@@ -12,13 +12,13 @@ interface PromiseCardProps {
 }
 
 const PromiseCard = ({
-  planStatus,
+  promiseStatus,
   title,
   date,
   memberCount,
   onClick,
 }: PromiseCardProps) => {
-  const isCompleted = planStatus === '확정 완료';
+  const isCompleted = promiseStatus === '확정 완료';
 
   return (
     <div
@@ -30,7 +30,7 @@ const PromiseCard = ({
           <p className="text-[#111111] font-Pretendard font-semibold text-[1.25rem] leading-7">
             {title}
           </p>
-          <PromiseStatusBadge status={planStatus} />
+          <PromiseStatusBadge status={promiseStatus} />
         </div>
         <p className="text-[#B2B2B2] font-Pretendard font-regular text-[0.875rem] leading-5">
           {date}
