@@ -1,16 +1,10 @@
-import { useAuthStore } from '@/stores/authStore';
-import { useNavigate } from 'react-router-dom';
 import LoginButton from './components/LoginButton';
 import MainLogoIcon from '@assets/images/mainLogoIcon.svg';
 
 const Login = () => {
-  const { login } = useAuthStore();
-  const navigate = useNavigate();
-
-  // 로그인 완료 시 홈 화면으로
-  const handleLogin = () => {
-    login();
-    navigate('/home', { replace: true });
+  // 소셜 로그인 리다이렉트
+  const handleLogin = (provider: 'kakao' | 'naver') => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/${provider}`;
   };
 
   return (
@@ -22,8 +16,8 @@ const Login = () => {
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        <LoginButton type="kakao" onClick={handleLogin} />
-        <LoginButton type="naver" onClick={handleLogin} />
+        <LoginButton type="kakao" onClick={() => handleLogin('kakao')} />
+        <LoginButton type="naver" onClick={() => handleLogin('naver')} />
       </div>
     </div>
   );
