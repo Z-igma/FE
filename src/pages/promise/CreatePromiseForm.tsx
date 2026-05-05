@@ -48,7 +48,7 @@ const CreatePromiseForm = () => {
         isMultipleVoting: isMultiVote,
       },
       {
-        onSuccess: res => navigate(`/home`),
+        onSuccess: () => navigate(`/home`),
       },
     );
   };
