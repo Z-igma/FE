@@ -35,7 +35,7 @@ const CreatePromiseForm = () => {
     showAllErrors,
     isValid,
   } = useCreatePromise();
-  const { mutate, isPending } = useCreatePromiseMutation();
+  const { mutate } = useCreatePromiseMutation();
 
   const handleSubmit = () => {
     const promisedAt = `${formatDateToISO(selectedDate!)}T${parseTimeLabel(selectedTime!)}`;

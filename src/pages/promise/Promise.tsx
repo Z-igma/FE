@@ -5,7 +5,7 @@ import NonePromiseIcon from '@/assets/images/home/nonePromiseIcon.svg';
 import { usePromises } from '../home/services/usePromises';
 
 const Promise = () => {
-  const { data, isLoading } = usePromises();
+  const { data } = usePromises();
   const navigate = useNavigate();
   const now = new Date();
 
