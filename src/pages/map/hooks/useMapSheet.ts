@@ -13,7 +13,7 @@ interface UseMapSheetProps {
   setIsCommentMode: (v: boolean) => void;
   setCommentLatLng: (v: { lat: number; lng: number } | null) => void;
   setIsCommentOpen: (v: boolean) => void;
-  openCommentId: string | null;
+  openCommentId: number | null;
 }
 
 // 바텀 시트 열림/닫힘, 마커 미등록 장소, 지도 클릭 관리

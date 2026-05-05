@@ -40,7 +40,7 @@ const Home = () => {
           {activePromises.map(promise => (
             <PromiseCard
               key={promise.id}
-              planStatus={promise.planStatus}
+              promiseStatus={promise.promiseStatus}
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
@@ -60,7 +60,7 @@ const Home = () => {
           {pastPromises.map(promise => (
             <PromiseCard
               key={promise.id}
-              planStatus={promise.planStatus}
+              promiseStatus={promise.promiseStatus}
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}

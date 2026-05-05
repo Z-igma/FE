@@ -4,31 +4,16 @@ import BottomSheet from '@/components/common/BottomSheet';
 import BottomButton from '@/components/common/BottomButton';
 import WarningIcon from '@/assets/images/warningIcon.svg';
 import { useNavigate } from 'react-router-dom';
-
-// 실제 약속 목록으로 교체 예정
-const promises = [
-  {
-    id: 1,
-    title: '저녁약속',
-    planStatus: '장소 미정',
-    promisedAt: '2026-05-28T21:26:12',
-    dayOfWeek: '목',
-    memberCount: 1,
-  },
-  {
-    id: 2,
-    title: '저녁약속',
-    planStatus: '장소 미정',
-    promisedAt: '2026-05-28T21:26:12',
-    dayOfWeek: '목',
-    memberCount: 1,
-  },
-];
+import { usePromises } from '../home/services/usePromises';
 
 const Map = () => {
   const navigate = useNavigate();
   const [center, setCenter] = useState({ lat: 37.5823688, lng: 127.0111299 });
   const [isOpen, setIsOpen] = useState(true);
+
+  const { data, isLoading } = usePromises();
+
+  const promises = data?.data?.promises ?? [];
 
   // 위치 허용 시 사용자 위치 기준으로 지도 표시
   useEffect(() => {
@@ -42,10 +27,14 @@ const Map = () => {
 
   // 약속이 하나뿐이면 해당 약속의 지도로 바로 이동
   useEffect(() => {
-    if (promises.length === 1) {
-      navigate(`/map/${promises[0].id}`);
+    if (!isLoading && promises.length === 1) {
+      navigate(`/map/${promises[0].id}`, {
+        state: { promise: promises[0] },
+      });
     }
-  }, []);
+  }, [isLoading, promises, navigate]);
+
+  if (isLoading) return null;
 
   return (
     <div className="fixed inset-0 overflow-hidden">

@@ -24,7 +24,11 @@ interface PromiseStatusBadgeProps {
 }
 
 const PromiseStatusBadge = ({ status }: PromiseStatusBadgeProps) => {
-  const config = STATUS_CONFIG[status];
+  const config = STATUS_CONFIG[status] ?? {
+    dot: 'bg-[#B2B2B2]',
+    badge: 'bg-[#B2B2B2] text-[#FFFFFF]',
+    label: status ?? '',
+  };
 
   return (
     <div

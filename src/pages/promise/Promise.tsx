@@ -2,27 +2,20 @@ import { useNavigate } from 'react-router-dom';
 import PromiseCard from '@/pages/home/components/PromiseCard';
 import { formatDate } from '@/pages/home/hooks/usePromiseList';
 import NonePromiseIcon from '@/assets/images/home/nonePromiseIcon.svg';
-
-// 교체 예정 약속 데이터
-const mockPromises = [
-  {
-    id: 1,
-    title: '저녁 모임',
-    planStatus: '진행 중',
-    promisedAt: '2026-05-28T21:26:12',
-    dayOfWeek: '목',
-    memberCount: 3,
-  },
-];
+import { usePromises } from '../home/services/usePromises';
 
 const Promise = () => {
+  const { data } = usePromises();
   const navigate = useNavigate();
   const now = new Date();
 
+  const promises = data?.data.promises ?? [];
+
   // 확정 완료 + 진행 중 약속
-  const upcomingConfirmedPromises = mockPromises.filter(
+  const upcomingConfirmedPromises = promises.filter(
     promise =>
-      promise.planStatus === '확정 완료' && new Date(promise.promisedAt) >= now,
+      promise.promiseStatus === '확정 완료' &&
+      new Date(promise.promisedAt) >= now,
   );
 
   return upcomingConfirmedPromises.length > 0 ? (
@@ -39,7 +32,7 @@ const Promise = () => {
         {upcomingConfirmedPromises.map(promise => (
           <PromiseCard
             key={promise.id}
-            planStatus={promise.planStatus}
+            promiseStatus={promise.promiseStatus}
             title={promise.title}
             date={formatDate(promise.promisedAt, promise.dayOfWeek)}
             memberCount={promise.memberCount}

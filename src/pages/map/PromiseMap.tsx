@@ -15,12 +15,19 @@ import { useMapLocation } from './hooks/useMapLocation';
 import { useVoteState } from './hooks/useVoteState';
 import { useMapSheet } from './hooks/useMapSheet';
 import { useComment } from './hooks/useComment';
-import type { Comment } from '@/types/map';
+import type { GetCommentsParams } from '@/types/map/comment.type';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import CommentIcon from '@/assets/images/map/commentIcon.svg';
 
 const PromiseMap = () => {
+  const [bounds, setBounds] = useState<GetCommentsParams>({
+    minLat: 37.55,
+    maxLat: 37.61,
+    minLng: 126.98,
+    maxLng: 127.04,
+  });
+
   const navigate = useNavigate();
   const { state } = useLocation();
   const { promiseId } = useParams();
@@ -50,7 +57,7 @@ const PromiseMap = () => {
     setOpenCommentId,
     handleCommentSubmit,
     handleCommentClose,
-  } = useComment();
+  } = useComment(Number(promiseId), bounds);
 
   const {
     isSheetOpen,
@@ -98,6 +105,15 @@ const PromiseMap = () => {
         center={center}
         style={{ width: '100%', height: 'calc(100% - 6rem)' }}
         onClick={handleMapClick}
+        onIdle={map => {
+          const b = map.getBounds();
+          setBounds({
+            minLat: b.getSouthWest().getLat(),
+            maxLat: b.getNorthEast().getLat(),
+            minLng: b.getSouthWest().getLng(),
+            maxLng: b.getNorthEast().getLng(),
+          });
+        }}
       >
         <MarkerClusterer
           averageCenter={true}
@@ -155,10 +171,10 @@ const PromiseMap = () => {
         </MarkerClusterer>
 
         {/* 등록된 코멘트 */}
-        {comments.map((comment: Comment) => (
+        {comments.map(comment => (
           <CustomOverlayMap
             key={comment.id}
-            position={{ lat: comment.lat, lng: comment.lng }}
+            position={{ lat: comment.latitude, lng: comment.longitude }} // lat/lng → latitude/longitude
             yAnchor={1}
             xAnchor={0.5}
           >
@@ -173,16 +189,16 @@ const PromiseMap = () => {
                 >
                   <div className="flex items-center gap-1 mb-1.5">
                     <img
-                      src={MapMemberIcon}
+                      src={comment.profileImageUrl}
                       className="w-4 h-4 rounded-full"
                       alt="프로필"
                     />
                     <span className="text-[#FFFFFF] text-[0.5rem] font-semibold leading-2">
-                      000
+                      {comment.nickname}
                     </span>
                   </div>
                   <p className="text-[#FFFFFF] text-[0.5rem] font-light leading-2">
-                    {comment.text}
+                    {comment.content}
                   </p>
                   <div className="absolute -left-2 top-9 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-8 border-t-transparent border-b-transparent border-r-[#2D2D2D]" />
                 </div>
@@ -190,7 +206,7 @@ const PromiseMap = () => {
               {openCommentId !== comment.id && (
                 <div className="relative">
                   <div
-                    className="w-7.5 h-7.5 rounded-full bg-[#00408E] flex items-center justify-center text-white text-xs font-semibold cursor-pointer"
+                    className="w-7.5 h-7.5 rounded-full bg-[#353535] flex items-center justify-center text-white text-xs font-semibold cursor-pointer"
                     onClick={e => {
                       e.stopPropagation();
                       setOpenCommentId(
@@ -198,9 +214,12 @@ const PromiseMap = () => {
                       );
                     }}
                   >
-                    <img src={MapMemberIcon} className="w-5.5 h-5.5" />
+                    <img
+                      src={comment.profileImageUrl}
+                      className="w-5.5 h-5.5 rounded-full z-10"
+                    />
                   </div>
-                  <div className="absolute -bottom-1 left-1 w-0 h-0 border-t-10 border-r-15 border-t-[#00408E] border-r-transparent rotate-12" />
+                  <div className="absolute -bottom-1 left-1 w-0 h-0 border-t-10 border-r-15 border-t-[#353535] border-r-transparent rotate-12" />
                 </div>
               )}
             </div>
@@ -216,6 +235,7 @@ const PromiseMap = () => {
           </p>
           <div className="flex">
             {Array.from({ length: promise?.memberCount ?? 1 }).map((_, i) => (
+              // 참여자별 프로필로 변경 예정
               <img
                 key={i}
                 src={MapMemberIcon}

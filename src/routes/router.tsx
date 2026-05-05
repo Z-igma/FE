@@ -12,10 +12,12 @@ import CreatePromiseForm from '@/pages/promise/CreatePromiseForm';
 import PromiseMap from '@/pages/map/PromiseMap';
 import VoteResult from '@/pages/map/VoteResult';
 import ConfirmedResult from '@/pages/map/ConfirmedResult';
+import OAuthCallback from '@/pages/login/components/OAuthCallback';
 
 const router = createBrowserRouter([
   { path: '/', element: <Splash /> },
   { path: '/login', element: <Login /> },
+  { path: '/oauth/callback', element: <OAuthCallback /> },
   {
     element: <MainLayout />,
     children: [
