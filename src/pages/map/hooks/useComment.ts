@@ -1,27 +1,29 @@
 import { useState } from 'react';
-import type { Comment } from '@/types/map';
+import { useComments, useCreateComment } from '../services/useCommentQuery';
+import type { GetCommentsParams } from '@/types/map/comment.type';
 
-// 모바일 환경에서 UUID 오류 해결
-const generateId = () =>
-  Math.random().toString(36).slice(2) + Date.now().toString(36);
-
-// 코멘트 모드 토글, 코멘트 목록, 채팅 바텀 시트 상태 관리
-export const useComment = () => {
+export const useComment = (promiseId: number, bounds: GetCommentsParams) => {
   const [isCommentMode, setIsCommentMode] = useState(false);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [commentLatLng, setCommentLatLng] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [openCommentId, setOpenCommentId] = useState<string | null>(null);
+  const [openCommentId, setOpenCommentId] = useState<number | null>(null);
 
-  // 코멘트 목록에 추가
+  const { data: comments = [] } = useComments(promiseId, bounds);
+  const { mutate: submitComment } = useCreateComment(promiseId);
+
+  // 코멘트 추가
   const handleCommentSubmit = (
-    text: string,
+    content: string,
     latLng: { lat: number; lng: number },
   ) => {
-    setComments(prev => [...prev, { id: generateId(), ...latLng, text }]);
+    submitComment({
+      content,
+      latitude: latLng.lat,
+      longitude: latLng.lng,
+    });
   };
 
   // 채팅 바텀 시트 닫기 + 좌표 초기화
