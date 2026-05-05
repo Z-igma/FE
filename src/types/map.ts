@@ -13,14 +13,6 @@ export interface SelectedPlace {
   proposedBy: string;
 }
 
-// 지도에 등록된 코멘트
-export interface Comment {
-  id: string;
-  lat: number;
-  lng: number;
-  text: string;
-}
-
 // 투표 결과 카드 상태
 export type CardStatus = 'best' | 'tie' | null;
 
