@@ -177,6 +177,7 @@ const PromiseMap = () => {
             position={{ lat: comment.latitude, lng: comment.longitude }} // lat/lng → latitude/longitude
             yAnchor={1}
             xAnchor={0.5}
+            clickable={true}
           >
             <div className="flex flex-col items-center">
               {openCommentId === comment.id && (
