@@ -48,6 +48,19 @@ export const useVoteResult = ({
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmedCandidate, setConfirmedCandidate] =
     useState<Candidate | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+
+  const handleVoteSubmit = () => {
+    if (myVote === null) return;
+    console.log('투표 제출 candidateId: ', myVote);
+    setHasVoted(true);
+  };
+
+  const handleVoteCancel = () => {
+    setHasVoted(false);
+    setMyVote(null);
+    console.log('투표 취소 candidateId: ', myVote);
+  };
 
   const displayCandidates = isRevote
     ? candidates.filter(c => c.voteCount === maxVote)
@@ -81,12 +94,6 @@ export const useVoteResult = ({
     }
   };
 
-  // 참여자가 투표
-  const handleVoteSubmit = () => {
-    if (myVote === null) return;
-    console.log('투표 제출 candidateId: ', myVote);
-  };
-
   return {
     sortedCandidates,
     myVote,
@@ -98,7 +105,9 @@ export const useVoteResult = ({
     buttonDisabled,
     getStatus,
     handleConfirmClick,
-    handleVoteSubmit,
     isTie,
+    hasVoted,
+    handleVoteSubmit,
+    handleVoteCancel,
   };
 };

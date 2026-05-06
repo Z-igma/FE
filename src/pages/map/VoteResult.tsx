@@ -10,7 +10,7 @@ import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg
 import RevoteMessageIcon from '@/assets/images/revoteMessageIcon.svg';
 
 const VoteResult = () => {
-  const isCreator = true; // 실제 생성자 구분 교체 예정
+  const isCreator = false; // 실제 생성자 구분 교체 예정
 
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -30,8 +30,10 @@ const VoteResult = () => {
     buttonDisabled,
     getStatus,
     handleConfirmClick,
-    handleVoteSubmit,
     isTie,
+    hasVoted,
+    handleVoteSubmit,
+    handleVoteCancel,
   } = useVoteResult({
     markers,
     votedPlaces,
@@ -100,9 +102,9 @@ const VoteResult = () => {
           />
         ) : (
           <BottomButton
-            text="투표하기"
-            disabled={myVote === null}
-            onClick={handleVoteSubmit}
+            text={hasVoted ? '다시 투표하기' : '투표하기'}
+            disabled={!hasVoted && myVote === null}
+            onClick={hasVoted ? handleVoteCancel : handleVoteSubmit}
           />
         )}
       </FixBottomLayout>
