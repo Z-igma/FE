@@ -19,6 +19,7 @@ import type { GetCommentsParams } from '@/types/map/comment.type';
 import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import CommentIcon from '@/assets/images/map/commentIcon.svg';
+import { useGetCandidatePlaces } from './services/useVotePalce';
 
 const PromiseMap = () => {
   const [bounds, setBounds] = useState<GetCommentsParams>({
@@ -40,9 +41,6 @@ const PromiseMap = () => {
     markers,
     votedPlace,
     votedPlaces,
-    handleToggleAdd,
-    handleToggleVote,
-    getIsVoted,
   } = useVoteState({ isMultipleVoting });
 
   const {
@@ -63,7 +61,6 @@ const PromiseMap = () => {
     isSheetOpen,
     setIsSheetOpen,
     selectedPlace,
-    pendingPlace,
     selectedOverlay,
     setSelectedOverlay,
     handleMapClick,
@@ -86,16 +83,15 @@ const PromiseMap = () => {
 
   if (!promise) return null;
 
-  const isPendingAdded = pendingPlace
-    ? markers.some(m => m.placeName === pendingPlace.placeName)
-    : false;
-
-  const isVoted = getIsVoted(pendingPlace);
   const isConfirmed = false; // 확정된 장소 예정
+
+  const {data: candidatePlacesResponse} = useGetCandidatePlaces(promiseId);
+  const candidatePlaces = candidatePlacesResponse?.data.candidates;
+  const candidatePlacesCount = candidatePlacesResponse?.data.count;
 
   const handleGoVoteResult = () => {
     navigate(`/map/${promiseId}/vote`, {
-      state: { promise, markers, votedPlaces: [...votedPlaces], votedPlace },
+      state: { promise, candidatesPlaces: candidatePlaces, votedPlaces: [...votedPlaces], votedPlace },
     });
   };
 
@@ -133,36 +129,46 @@ const PromiseMap = () => {
             },
           ]}
         >
-          {markers.map((marker, i) => (
+          {candidatePlaces?.map((candidatePlace, i) => (
             <>
               {/* 선택된 마커는 숨김 */}
               {!(
-                selectedOverlay?.lat === marker.lat &&
-                selectedOverlay?.lng === marker.lng
+                selectedOverlay?.lat === candidatePlace.latitude &&
+                selectedOverlay?.lng === candidatePlace.longitude
               ) && (
                 <MapMarker
                   key={`marker-${i}`}
-                  position={{ lat: marker.lat, lng: marker.lng }}
+                  position={{ lat: candidatePlace.latitude, lng: candidatePlace.longitude }}
                   image={{
                     src: CustomMarkerIcon,
                     size: { width: 30, height: 30 },
                   }}
-                  onClick={() => setSelectedOverlay(marker)}
+                  onClick={() => setSelectedOverlay({
+                    lat: candidatePlace.latitude,
+                    lng: candidatePlace.longitude,
+                    placeName: candidatePlace.name,
+                    address: candidatePlace.address,
+                  })}
                 />
               )}
 
               {/* 선택된 마커 위치에 말풍선 표시 */}
-              {selectedOverlay?.lat === marker.lat &&
-                selectedOverlay?.lng === marker.lng && (
+              {selectedOverlay?.lat === candidatePlace.latitude &&
+                selectedOverlay?.lng === candidatePlace.longitude && (
                   <CustomOverlayMap
                     key={`overlay-${i}`}
-                    position={{ lat: marker.lat, lng: marker.lng }}
+                    position={{ lat: candidatePlace.latitude, lng: candidatePlace.longitude }}
                     yAnchor={1}
                     xAnchor={0}
                   >
                     <LocationMarker
-                      name={marker.placeName}
-                      onClick={() => handleOverlayOpen(marker)}
+                      name={candidatePlace.name}
+                      onClick={() => handleOverlayOpen({
+                        lat: candidatePlace.latitude,
+                        lng: candidatePlace.longitude,
+                        placeName: candidatePlace.name,
+                        address: candidatePlace.address,
+                      })}
                     />
                   </CustomOverlayMap>
                 )}
@@ -252,7 +258,7 @@ const PromiseMap = () => {
       {/* 채팅 버튼 */}
       {!isSheetOpen && !isCommentOpen && (
         <div
-          className={`absolute right-6 z-50 ${markers.length > 0 ? 'bottom-48' : 'bottom-35'}`}
+          className={`absolute right-6 z-50 ${candidatePlacesCount && candidatePlacesCount > 0 ? 'bottom-48' : 'bottom-35'}`}
           onClick={() => {
             setIsSheetOpen(false);
             setSelectedOverlay(null);
@@ -303,15 +309,15 @@ const PromiseMap = () => {
       )}
 
       {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}
-      {markers.length > 0 && !isCommentMode && !isCommentOpen && (
+      {candidatePlacesCount && candidatePlacesCount > 0 && !isCommentMode && !isCommentOpen && (
         <VoteBottomSheet
           isOpen={!isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          count={markers.length}
+          count={candidatePlacesCount}
           promiseId={promiseId}
           promise={promise}
           onGoResult={handleGoVoteResult}
-          markers={markers}
+          candidatesPlaces={candidatePlaces ?? []}
           votedPlaces={[...votedPlaces]}
           votedPlace={votedPlace}
         />
@@ -320,19 +326,11 @@ const PromiseMap = () => {
       {/* 장소 선택 시 상세 바텀 시트 */}
       {selectedPlace && !isCommentMode && (
         <LocationBottomSheet
+          candidatesPlaces={candidatePlaces ?? []}
+          promiseId={promiseId}
           isOpen={isSheetOpen}
           onClose={handleSheetClose}
-          placeName={selectedPlace.placeName}
-          address={selectedPlace.address}
-          proposedBy={selectedPlace.proposedBy}
-          isAdded={isPendingAdded}
-          onToggleAdd={isAdded =>
-            pendingPlace && handleToggleAdd(isAdded, pendingPlace)
-          }
-          isVoted={isVoted}
-          onToggleVote={isVotedNext =>
-            pendingPlace && handleToggleVote(isVotedNext, pendingPlace)
-          }
+          selectedPlace={selectedPlace}
           isConfirmed={isConfirmed}
         />
       )}
