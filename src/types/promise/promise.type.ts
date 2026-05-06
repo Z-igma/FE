@@ -30,3 +30,22 @@ export interface PromiseListData {
   count: number;
   hasNext: boolean;
 }
+
+// 약속 참여자
+export interface PromiseMember {
+  userId: number;
+  nickName: string;
+  profileImageUrl: string;
+  role: 'HOST' | 'GUEST';
+}
+
+// 약속 상세 조회
+export interface PromiseDetail {
+  id: number;
+  title: string;
+  promisedAt: string;
+  dayOfWeek: string;
+  isMultipleVoting: boolean;
+  memberCount: number;
+  members: PromiseMember[];
+}

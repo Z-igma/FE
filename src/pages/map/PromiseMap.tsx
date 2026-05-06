@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   CustomOverlayMap,
   Map,
@@ -16,9 +16,9 @@ import { useVoteState } from './hooks/useVoteState';
 import { useMapSheet } from './hooks/useMapSheet';
 import { useComment } from './hooks/useComment';
 import type { GetCommentsParams } from '@/types/map/comment.type';
-import MapMemberIcon from '@/assets/images/map/mapMemberIcon.svg';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import CommentIcon from '@/assets/images/map/commentIcon.svg';
+import { usePromiseDetail } from './services/usePromiseDetail';
 
 const PromiseMap = () => {
   const [bounds, setBounds] = useState<GetCommentsParams>({
@@ -29,9 +29,9 @@ const PromiseMap = () => {
   });
 
   const navigate = useNavigate();
-  const { state } = useLocation();
   const { promiseId } = useParams();
-  const promise = state?.promise;
+  const parsedPromiseId = Number(promiseId);
+  const { data: promise } = usePromiseDetail(parsedPromiseId);
 
   const { center, isOnline } = useMapLocation();
   const isMultipleVoting = promise?.isMultipleVoting ?? false;
@@ -234,14 +234,13 @@ const PromiseMap = () => {
             {promise?.title}
           </p>
           <div className="flex">
-            {Array.from({ length: promise?.memberCount ?? 1 }).map((_, i) => (
-              // 참여자별 프로필로 변경 예정
+            {promise.members.map((member, i) => (
               <img
-                key={i}
-                src={MapMemberIcon}
-                className="w-5 h-5"
+                key={member.userId}
+                src={member.profileImageUrl}
+                className="w-5 h-5 rounded-full"
                 style={{ marginLeft: i === 0 ? 0 : '-3px' }}
-                alt="참여자"
+                alt={member.nickName}
               />
             ))}
           </div>
