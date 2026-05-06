@@ -39,7 +39,8 @@ const tabs = [
 const BottomNavBar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { isLoggedIn } = useAuthStore();
+  const { accessToken } = useAuthStore();
+  const isLoggedIn = !!accessToken;
 
   // 비로그인 시 지도 및 홈만 접근 가능
   const handleTabClick = (path: string) => {
