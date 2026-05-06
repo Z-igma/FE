@@ -22,7 +22,6 @@ const VoteResult = () => {
   const {
     sortedCandidates,
     myVote,
-    setMyVote,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
     confirmedCandidate,
