@@ -44,11 +44,22 @@ export const useVoteResult = ({
 
   const [isRevote, setIsRevote] = useState(true);
   const isRevoteTie = false;
-  const [myVote, setMyVote] = useState<number | null>(null);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [myVote, setMyVote] = useState<number[]>([]);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmedCandidate, setConfirmedCandidate] =
     useState<Candidate | null>(null);
-  const [hasVoted, setHasVoted] = useState(false);
+
+  // 후보지 토글
+  const handleSelect = (id: number) => {
+    if (isMultipleVoting) {
+      setMyVote(prev =>
+        prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id],
+      );
+    } else {
+      setMyVote(prev => (prev.includes(id) ? [] : [id]));
+    }
+  };
 
   const handleVoteSubmit = () => {
     if (myVote === null) return;
@@ -58,7 +69,7 @@ export const useVoteResult = ({
 
   const handleVoteCancel = () => {
     setHasVoted(false);
-    setMyVote(null);
+    setMyVote([]);
     console.log('투표 취소 candidateId: ', myVote);
   };
 
@@ -86,9 +97,10 @@ export const useVoteResult = ({
     if (isTie && !isRevote && !isRevoteTie) {
       setIsRevote(true);
     } else {
-      const target = myVote
-        ? candidates.find(c => c.id === myVote)
-        : topCandidates[0];
+      const target =
+        myVote.length > 0
+          ? candidates.find(c => c.id === myVote[0])
+          : topCandidates[0];
       setConfirmedCandidate(target ?? null);
       setIsConfirmModalOpen(true);
     }
@@ -109,5 +121,6 @@ export const useVoteResult = ({
     hasVoted,
     handleVoteSubmit,
     handleVoteCancel,
+    handleSelect,
   };
 };

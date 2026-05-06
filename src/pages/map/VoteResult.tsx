@@ -34,6 +34,7 @@ const VoteResult = () => {
     hasVoted,
     handleVoteSubmit,
     handleVoteCancel,
+    handleSelect,
   } = useVoteResult({
     markers,
     votedPlaces,
@@ -77,8 +78,8 @@ const VoteResult = () => {
                 key={candidate.id}
                 status={getStatus(candidate.voteCount)}
                 isSelectable={true}
-                isSelected={myVote === candidate.id}
-                onSelect={() => setMyVote(candidate.id)}
+                isSelected={myVote.includes(candidate.id)}
+                onSelect={() => handleSelect(candidate.id)}
                 name={candidate.name}
                 distance={candidate.distance}
                 address={candidate.address}
@@ -103,7 +104,7 @@ const VoteResult = () => {
         ) : (
           <BottomButton
             text={hasVoted ? '다시 투표하기' : '투표하기'}
-            disabled={!hasVoted && myVote === null}
+            disabled={!hasVoted && myVote.length === 0}
             onClick={hasVoted ? handleVoteCancel : handleVoteSubmit}
           />
         )}
