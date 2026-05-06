@@ -35,10 +35,10 @@ export const useVoteResult = ({
   const hasVote = candidates.some(c => c.voteCount > 0);
   const maxVote = Math.max(...candidates.map(c => c.voteCount));
   const topCandidates = candidates.filter(c => c.voteCount === maxVote);
-  const isTie = topCandidates.length > 1;
+  const isTie = hasVote && topCandidates.length > 1;
 
   const getStatus = (voteCount: number): CardStatus => {
-    if (voteCount !== maxVote) return null;
+    if (!hasVote || voteCount !== maxVote) return null;
     return isTie ? 'tie' : 'best';
   };
 
