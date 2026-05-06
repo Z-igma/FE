@@ -39,11 +39,16 @@ const PromiseCard = ({
 
       {!isCompleted &&
         (memberCount === 1 ? (
-          <div className="flex items-center p-1.5 w-61 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
-            <img src={MemberInvitePlusIcon} />
-            <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
-              친구를 초대하기
-            </p>
+          <div className="flex w-full justify-between gap-15">
+            <div className="flex items-center p-1.5 w-full bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
+              <img src={MemberInvitePlusIcon} />
+              <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
+                친구를 초대하기
+              </p>
+            </div>
+            <div className="w-7.5 h-7.5 shrink-0 flex items-center justify-center bg-[#E4E4E4] rounded-full">
+              <img src={CardDetailButtonIcon} />
+            </div>
           </div>
         ) : (
           <div className="flex justify-between items-center">
