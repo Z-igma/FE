@@ -9,8 +9,10 @@ import PlusIcon from '@/assets/images/plusIcon.svg';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const { activePromises, pastPromises, hasPromise } = usePromiseList();
+
+  const isLoggedIn = !!accessToken;
 
   // 로그인 후 약속 생성 가능
   const handleBottomButton = () => {
