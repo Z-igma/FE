@@ -5,11 +5,12 @@ import BottomButton from '@/components/common/BottomButton';
 import Header from '@/components/layout/Header';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 import { useVoteResult } from './hooks/useVoteResult';
-import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
 import FixBottomLayout from '@/components/layout/FixBottomLayout';
+import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
+import RevoteMessageIcon from '@/assets/images/revoteMessageIcon.svg';
 
 const VoteResult = () => {
-  const isCreator = true; // 약속 생성자 구분 추가 예정
+  const isCreator = true; // 실제 생성자 구분 교체 예정
 
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -29,11 +30,13 @@ const VoteResult = () => {
     buttonDisabled,
     getStatus,
     handleConfirmClick,
+    handleVoteSubmit,
+    isTie,
   } = useVoteResult({
     markers,
     votedPlaces,
     votedPlace,
-    isMultipleVoting: promise?.isMultipleVoting ?? false,
+    isMultipleVoting: promise?.isMultipleVoting ?? true,
   });
 
   return (
@@ -43,52 +46,69 @@ const VoteResult = () => {
         <div className="flex justify-between px-4">
           <div className="flex flex-col gap-1">
             <p className="text-[#111111] font-Pretendard font-semibold text-[1.5rem] leading-8.4">
-              {promise.title}
+              {promise?.title}
             </p>
             <div className="flex items-center gap-1.5">
               <img src={CandidateVoteMemberIcon} />
               <p className="text-[#B2B2B2] font-Pretendard font-medium text-[0.875rem] leading-3.5">
-                {promise.memberCount}명 참여
+                {promise?.memberCount}명 참여
               </p>
             </div>
           </div>
           <div>
-            <PromiseStatusBadge status={promise.promiseStatus} />
+            <PromiseStatusBadge status={promise?.promiseStatus} />
           </div>
-
-          {isCreator && (
-            <FixBottomLayout>
-              <BottomButton
-                text={buttonText}
-                disabled={buttonDisabled}
-                onClick={handleConfirmClick}
-              />
-            </FixBottomLayout>
-          )}
         </div>
 
-        <div className="flex flex-col overflow-y-auto max-h-[calc(100vh-260px)] px-4 gap-5 pb-20">
-          {sortedCandidates.map(candidate => (
-            <CandidatesCard
-              key={candidate.id}
-              status={getStatus(candidate.voteCount)}
-              isSelectable={isCreator}
-              isSelected={myVote === candidate.id}
-              onSelect={() => setMyVote(candidate.id)}
-              name={candidate.name}
-              distance={candidate.distance}
-              address={candidate.address}
-              createMember={candidate.createMember}
-              voteMember={candidate.voteMember}
-              voteCount={candidate.voteCount}
-              memberCount={promise.memberCount}
-            />
-          ))}
+        <div className="flex flex-col gap-2">
+          {isTie && (
+            <div className="flex items-center gap-1 px-4">
+              <img src={RevoteMessageIcon} />
+              <p className="text-[#FF9800] font-Pretendard font-regular text-[0.75rem] leading-4.2">
+                동점 시 재투표를 진행해 주세요
+              </p>
+            </div>
+          )}
+          <div className="flex flex-col overflow-y-auto max-h-[calc(100vh-260px)] px-4 gap-5 pb-20">
+            {sortedCandidates.map(candidate => (
+              <CandidatesCard
+                key={candidate.id}
+                status={getStatus(candidate.voteCount)}
+                isSelectable={true}
+                isSelected={myVote === candidate.id}
+                onSelect={() => setMyVote(candidate.id)}
+                name={candidate.name}
+                distance={candidate.distance}
+                address={candidate.address}
+                createMember={candidate.createMember}
+                voteMember={candidate.voteMember}
+                voteCount={candidate.voteCount}
+                memberCount={promise?.memberCount}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* 확정 모달 */}
-      {isConfirmModalOpen && confirmedCandidate && (
+      {/* 방장은 확정 버튼 / 참여자는 투표 버튼 */}
+      <FixBottomLayout>
+        {isCreator ? (
+          <BottomButton
+            text={buttonText}
+            disabled={buttonDisabled}
+            onClick={handleConfirmClick}
+          />
+        ) : (
+          <BottomButton
+            text="투표하기"
+            disabled={myVote === null}
+            onClick={handleVoteSubmit}
+          />
+        )}
+      </FixBottomLayout>
+
+      {/* 확정 모달  */}
+      {isCreator && isConfirmModalOpen && confirmedCandidate && (
         <div className="fixed inset-0 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50">
           <CommonModal
             questionText="이 장소를 확정할까요?"

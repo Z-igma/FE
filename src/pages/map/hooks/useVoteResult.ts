@@ -8,14 +8,12 @@ interface UseVoteResultProps {
   isMultipleVoting: boolean;
 }
 
-// 투표 결과 계산 및 장소 확정 흐름 관리
 export const useVoteResult = ({
   markers,
   votedPlaces,
   votedPlace,
   isMultipleVoting,
 }: UseVoteResultProps) => {
-  // 마커별 득표 수 계산
   const getVoteCount = (marker: Marker): number => {
     const key = `${marker.lat}_${marker.lng}`;
     if (isMultipleVoting) {
@@ -39,30 +37,27 @@ export const useVoteResult = ({
   const topCandidates = candidates.filter(c => c.voteCount === maxVote);
   const isTie = topCandidates.length > 1;
 
-  // 득표 수에 따른 카드 표시 상태 반환
   const getStatus = (voteCount: number): CardStatus => {
     if (voteCount !== maxVote) return null;
     return isTie ? 'tie' : 'best';
   };
 
-  const [isRevote, setIsRevote] = useState(false);
-  const isRevoteTie = false; // 재투표 후 동점 여부 (추후 연동)
+  const [isRevote, setIsRevote] = useState(true);
+  const isRevoteTie = false;
   const [myVote, setMyVote] = useState<number | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmedCandidate, setConfirmedCandidate] =
     useState<Candidate | null>(null);
 
-  // 재투표 중엔 동점 후보지만 표시
   const displayCandidates = isRevote
     ? candidates.filter(c => c.voteCount === maxVote)
     : candidates;
 
-  // 1위부터 정렬
   const sortedCandidates = [...displayCandidates].sort(
     (a, b) => b.voteCount - a.voteCount,
   );
 
-  // 현재 상태에 따른 버튼 텍스트
+  // 방장 버튼 텍스트
   const buttonText = isRevoteTie
     ? '임의로 장소 확정하기'
     : isRevote
@@ -71,10 +66,9 @@ export const useVoteResult = ({
         ? '다시 투표하기'
         : '장소 결정하기';
 
-  // 재투표 중엔 버튼 항상 활성화
   const buttonDisabled = isRevote ? false : !hasVote;
 
-  // 확정 버튼 클릭 처리
+  // 방장이 확정
   const handleConfirmClick = () => {
     if (isTie && !isRevote && !isRevoteTie) {
       setIsRevote(true);
@@ -87,11 +81,14 @@ export const useVoteResult = ({
     }
   };
 
+  // 참여자가 투표
+  const handleVoteSubmit = () => {
+    if (myVote === null) return;
+    console.log('투표 제출 candidateId: ', myVote);
+  };
+
   return {
-    candidates,
     sortedCandidates,
-    isTie,
-    isRevote,
     myVote,
     setMyVote,
     isConfirmModalOpen,
@@ -101,5 +98,7 @@ export const useVoteResult = ({
     buttonDisabled,
     getStatus,
     handleConfirmClick,
+    handleVoteSubmit,
+    isTie,
   };
 };
