@@ -98,7 +98,7 @@ export const useMapSheet = ({
         result[0].road_address?.address_name ?? result[0].address.address_name;
       findNearestPlace(lat, lng, placeName => {
         setPendingPlace({ lat, lng, placeName, address });
-        setSelectedPlace({ placeName, address, proposedBy: '나' });
+        setSelectedPlace({ placeName, address, proposedBy: '나', lat, lng });
         setIsSheetOpen(true);
       });
     });
@@ -117,6 +117,8 @@ export const useMapSheet = ({
       placeName: marker.placeName,
       address: marker.address,
       proposedBy: '나',
+      lat: marker.lat,
+      lng: marker.lng,
     });
     setIsSheetOpen(true);
     setSelectedOverlay(null);

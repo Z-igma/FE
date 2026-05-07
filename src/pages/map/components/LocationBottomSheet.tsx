@@ -1,38 +1,76 @@
+import axios from "axios";
+
 import BottomSheet from '@/components/common/BottomSheet';
 import MemberIcon from '@/assets/images/memberIcon.svg';
 import PlusIcon from '@/assets/images/plusIcon.svg';
 import NomineeMinusIcon from '@/assets/images/map/nomineeMinusIcon.svg';
 import VoteIcon from '@/assets/images/map/voteIcon.svg';
 import WarningIcon from '@/assets/images/warningIcon.svg';
+import { useAddCandidatePlace, useDeleteCandidatePlace } from '../services/useVotePalce';
+import type { CandidatePlace } from '@/types/map/votePlace.type';
 
 interface LocationBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  placeName: string;
-  address: string;
-  proposedBy: string;
-  isAdded: boolean;
-  onToggleAdd: (isAdded: boolean) => void;
-  isVoted: boolean;
-  onToggleVote: (isVoted: boolean) => void;
+  selectedPlace: {
+    placeName: string;
+    address: string;
+    proposedBy: string;
+    lat: number;
+    lng: number;
+    category?: string;
+  };
+  candidatesPlaces: CandidatePlace[];
   isConfirmed: boolean;
+  promiseId?: string;
 }
 
 const LocationBottomSheet = ({
   isOpen,
   onClose,
-  placeName,
-  address,
-  proposedBy,
-  isAdded,
-  onToggleAdd,
-  isVoted,
-  onToggleVote,
+  selectedPlace,
+  candidatesPlaces,
   isConfirmed,
+  promiseId,
 }: LocationBottomSheetProps) => {
-  const isError = placeName === '선택한 위치';
+  const isError = selectedPlace.placeName === '선택한 위치';
 
   const height = isError ? 'h-60' : isConfirmed ? 'h-60' : 'h-45';
+
+  const isAdded = candidatesPlaces.some(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address);
+  const isVoted = candidatesPlaces.some(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address);
+  const selectedPlaceId = candidatesPlaces.find(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address)?.id;
+
+  const {mutate: addCandidatePlaceMutate} = useAddCandidatePlace(promiseId);
+
+  const addCandidatePlaceHandler = () => {
+    addCandidatePlaceMutate({
+      name: selectedPlace.placeName,
+      address: selectedPlace.address,
+      latitude: selectedPlace.lat,
+      longitude: selectedPlace.lng,
+      category: selectedPlace.category || "",
+    });
+  };
+
+  
+  const {mutate: deleteCandidatePlaceMutate} = useDeleteCandidatePlace(promiseId, selectedPlaceId);
+
+  const deleteCandidatePlaceHandler = () => {
+    deleteCandidatePlaceMutate(undefined, {
+      onError: error => {
+        if (axios.isAxiosError(error)) {
+          const status = error.response?.status;
+          if (status === 403) {
+            alert("후보지는 등록한 본인만 제거할 수 있어요.");
+          }
+        }
+      }
+    });
+  }
+
+
+  console.log(selectedPlace);
 
   return (
     <BottomSheet
@@ -70,12 +108,12 @@ const LocationBottomSheet = ({
           <div className="flex justify-between">
             <div className="flex flex-col gap-0.5 min-w-0">
               <p className="text-[#111111] font-Pretendard font-semibold text-[1.375rem] leading-7.7 truncate">
-                {placeName}
+                {selectedPlace.placeName}
               </p>
               <div className="flex gap-0.5 items-center">
                 <img src={MemberIcon} />
                 <p className="text-[#888888] font-Pretendard font-medium text-[0.75rem] leading-4.2">
-                  <span className="font-semibold">{proposedBy}</span> 님이 제안
+                  <span className="font-semibold">{selectedPlace.proposedBy}</span> 님이 제안
                 </p>
               </div>
             </div>
@@ -93,14 +131,14 @@ const LocationBottomSheet = ({
                     className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${
                       isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'
                     }`}
-                    onClick={() => onToggleVote(!isVoted)}
+                    onClick={() => {}}
                   >
                     <img src={VoteIcon} />
                   </div>
                 )}
                 <div
                   className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isAdded ? 'bg-[#D40004]' : 'bg-[#00408E]'}`}
-                  onClick={() => onToggleAdd(!isAdded)}
+                  onClick={() => isAdded ? deleteCandidatePlaceHandler() : addCandidatePlaceHandler()}
                 >
                   <img
                     src={isAdded ? NomineeMinusIcon : PlusIcon}
@@ -112,7 +150,7 @@ const LocationBottomSheet = ({
           </div>
 
           <p className="whitespace-pre-line text-[#111111] font-Pretendard font-regular text-[0.75rem] leading-4.5">
-            {`📍 ${address}\n ⏰ \n💸`}
+            {`📍 ${selectedPlace.address}\n ⏰ \n💸`}
           </p>
 
           {/* 확정 시 하단 안내 문구 */}
