@@ -41,7 +41,7 @@ const LocationBottomSheet = ({
   const isVoted = candidatesPlaces.some(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address);
   const selectedPlaceId = candidatesPlaces.find(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address)?.id;
 
-  const {mutate: addCandidatePlaceMutate, isError: isAddCandidatePlaceError} = useAddCandidatePlace(promiseId);
+  const {mutate: addCandidatePlaceMutate} = useAddCandidatePlace(promiseId);
 
   const addCandidatePlaceHandler = () => {
     addCandidatePlaceMutate({

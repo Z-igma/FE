@@ -1,4 +1,3 @@
-import type { Marker } from '@/types/map';
 import VoteStateBox from './VoteStateBox';
 import BottomButton from '@/components/common/BottomButton';
 import BottomSheet from '@/components/common/BottomSheet';

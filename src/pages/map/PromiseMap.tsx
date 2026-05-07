@@ -38,7 +38,6 @@ const PromiseMap = () => {
   const isMultipleVoting = promise?.isMultipleVoting ?? false;
 
   const {
-    markers,
     votedPlace,
     votedPlaces,
   } = useVoteState({ isMultipleVoting });
