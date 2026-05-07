@@ -205,18 +205,6 @@ const CreatePromiseForm = () => {
           </div>
         </div>
 
-        <div className="flex justify-between items-center">
-          <CreatePromiseTitle title="참여자 초대" />
-          <button
-            onClick={showAllErrors}
-            className="py-1 px-4 border bg-[#FAFAFA] border-[#C6C6C6] rounded-[10px] active:bg-[#00408E]"
-          >
-            <p className="text-[0.875rem] font-Pretendard text-[#C6C6C6] font-light leading-5 active:text-[#FFFFFF]">
-              공유하기
-            </p>
-          </button>
-        </div>
-
         <div className="flex justify-between">
           <CreatePromiseTitle title="장소 복수 투표" />
           <div
