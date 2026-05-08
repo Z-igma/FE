@@ -18,6 +18,7 @@ import { useComment } from './hooks/useComment';
 import type { GetCommentsParams } from '@/types/map/comment.type';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import CommentIcon from '@/assets/images/map/commentIcon.svg';
+import { useGetCandidatePlaces } from './services/useVotePalce';
 import { usePromiseDetail } from './services/usePromiseDetail';
 
 const PromiseMap = () => {
@@ -36,14 +37,7 @@ const PromiseMap = () => {
   const { center, isOnline } = useMapLocation();
   const isMultipleVoting = promise?.isMultipleVoting ?? false;
 
-  const {
-    markers,
-    votedPlace,
-    votedPlaces,
-    handleToggleAdd,
-    handleToggleVote,
-    getIsVoted,
-  } = useVoteState({ isMultipleVoting });
+  const { votedPlace, votedPlaces } = useVoteState({ isMultipleVoting });
 
   const {
     isCommentMode,
@@ -63,7 +57,6 @@ const PromiseMap = () => {
     isSheetOpen,
     setIsSheetOpen,
     selectedPlace,
-    pendingPlace,
     selectedOverlay,
     setSelectedOverlay,
     handleMapClick,
@@ -78,26 +71,32 @@ const PromiseMap = () => {
   });
 
   const [showToast, setShowToast] = useState(true);
+  const [isCardExpanded, setIsCardExpanded] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowToast(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  if (!promise) return null;
-
-  const isPendingAdded = pendingPlace
-    ? markers.some(m => m.placeName === pendingPlace.placeName)
-    : false;
-
-  const isVoted = getIsVoted(pendingPlace);
   const isConfirmed = false; // 확정된 장소 예정
+
+  const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
+  const candidatePlaces = candidatePlacesResponse?.data.candidates;
+  const candidatePlacesCount = candidatePlacesResponse?.data.count;
 
   const handleGoVoteResult = () => {
     navigate(`/map/${promiseId}/vote`, {
-      state: { promise, markers, votedPlaces: [...votedPlaces], votedPlace },
+      state: {
+        promise,
+        candidatesPlaces: candidatePlaces,
+        votedPlaces: [...votedPlaces],
+        votedPlace,
+      },
     });
   };
+
+  if (!promise) return null;
+  const isLeader = promise.isLeader;
 
   return (
     <div className="fixed inset-0 overflow-hidden">
@@ -133,36 +132,56 @@ const PromiseMap = () => {
             },
           ]}
         >
-          {markers.map((marker, i) => (
+          {candidatePlaces?.map((candidatePlace, i) => (
             <>
               {/* 선택된 마커는 숨김 */}
               {!(
-                selectedOverlay?.lat === marker.lat &&
-                selectedOverlay?.lng === marker.lng
+                selectedOverlay?.lat === candidatePlace.latitude &&
+                selectedOverlay?.lng === candidatePlace.longitude
               ) && (
                 <MapMarker
                   key={`marker-${i}`}
-                  position={{ lat: marker.lat, lng: marker.lng }}
+                  position={{
+                    lat: candidatePlace.latitude,
+                    lng: candidatePlace.longitude,
+                  }}
                   image={{
                     src: CustomMarkerIcon,
                     size: { width: 30, height: 30 },
                   }}
-                  onClick={() => setSelectedOverlay(marker)}
+                  onClick={() =>
+                    setSelectedOverlay({
+                      lat: candidatePlace.latitude,
+                      lng: candidatePlace.longitude,
+                      placeName: candidatePlace.name,
+                      address: candidatePlace.address,
+                    })
+                  }
                 />
               )}
 
               {/* 선택된 마커 위치에 말풍선 표시 */}
-              {selectedOverlay?.lat === marker.lat &&
-                selectedOverlay?.lng === marker.lng && (
+              {selectedOverlay?.lat === candidatePlace.latitude &&
+                selectedOverlay?.lng === candidatePlace.longitude && (
                   <CustomOverlayMap
                     key={`overlay-${i}`}
-                    position={{ lat: marker.lat, lng: marker.lng }}
+                    position={{
+                      lat: candidatePlace.latitude,
+                      lng: candidatePlace.longitude,
+                    }}
                     yAnchor={1}
                     xAnchor={0}
                   >
                     <LocationMarker
-                      name={marker.placeName}
-                      onClick={() => handleOverlayOpen(marker)}
+                      name={candidatePlace.name}
+                      onClick={() =>
+                        handleOverlayOpen({
+                          lat: candidatePlace.latitude,
+                          lng: candidatePlace.longitude,
+                          placeName: candidatePlace.name,
+                          address: candidatePlace.address,
+                        })
+                      }
                     />
                   </CustomOverlayMap>
                 )}
@@ -230,28 +249,52 @@ const PromiseMap = () => {
 
       {/* 약속 정보 카드 */}
       <div className="absolute top-0 left-0 pl-4 pt-5 z-10">
-        <div className="px-4.5 py-4 flex flex-col items-start gap-1 bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.10)]">
+        <div
+          className="px-4.5 py-4 flex flex-col items-start gap-2 bg-[#FFFFFF] border border-[#C6C6C6] rounded-[10px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.10)] cursor-pointer"
+          onClick={() => setIsCardExpanded(prev => !prev)}
+        >
           <p className="text-[#111111] font-Pretendard font-semibold text-[1.125rem] leading-4.5">
-            {promise?.title}
+            {promise.title}
           </p>
-          <div className="flex">
+          <div
+            className={`flex ${isCardExpanded ? 'flex-col gap-2' : 'flex-row'}`}
+          >
             {promise.members.map((member, i) => (
-              <img
+              <div
                 key={member.userId}
-                src={member.profileImageUrl}
-                className="w-5 h-5 rounded-full"
-                style={{ marginLeft: i === 0 ? 0 : '-3px' }}
-                alt={member.nickName}
-              />
+                className={`flex items-center ${isCardExpanded ? 'gap-2' : ''}`}
+              >
+                <img
+                  src={member.profileImageUrl ?? ''}
+                  className="w-6 h-6 rounded-full ring-2 ring-white"
+                  style={{
+                    marginLeft: isCardExpanded ? 0 : i === 0 ? 0 : '-4px',
+                  }}
+                  alt="참여자"
+                />
+                {isCardExpanded && (
+                  <p className="text-[#111111] text-[0.75rem] font-medium">
+                    {member.nickName}
+                  </p>
+                )}
+              </div>
             ))}
           </div>
+
+          {isLeader && isCardExpanded && (
+            <div className="px-3 py-1 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px] cursor-pointer">
+              <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
+                멤버 초대하기
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 채팅 버튼 */}
       {!isSheetOpen && !isCommentOpen && (
         <div
-          className={`absolute right-6 z-50 ${markers.length > 0 ? 'bottom-48' : 'bottom-35'}`}
+          className={`absolute right-6 z-50 ${candidatePlacesCount && candidatePlacesCount > 0 ? 'bottom-48' : 'bottom-35'}`}
           onClick={() => {
             setIsSheetOpen(false);
             setSelectedOverlay(null);
@@ -302,36 +345,31 @@ const PromiseMap = () => {
       )}
 
       {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}
-      {markers.length > 0 && !isCommentMode && !isCommentOpen && (
-        <VoteBottomSheet
-          isOpen={!isSheetOpen}
-          onClose={() => setIsSheetOpen(false)}
-          count={markers.length}
-          promiseId={promiseId}
-          promise={promise}
-          onGoResult={handleGoVoteResult}
-          markers={markers}
-          votedPlaces={[...votedPlaces]}
-          votedPlace={votedPlace}
-        />
-      )}
+      {!!candidatePlacesCount &&
+        candidatePlacesCount > 0 &&
+        !isCommentMode &&
+        !isCommentOpen && (
+          <VoteBottomSheet
+            isOpen={!isSheetOpen}
+            onClose={() => setIsSheetOpen(false)}
+            count={candidatePlacesCount}
+            promiseId={promiseId}
+            promise={promise}
+            onGoResult={handleGoVoteResult}
+            candidatesPlaces={candidatePlaces ?? []}
+            votedPlaces={[...votedPlaces]}
+            votedPlace={votedPlace}
+          />
+        )}
 
       {/* 장소 선택 시 상세 바텀 시트 */}
       {selectedPlace && !isCommentMode && (
         <LocationBottomSheet
+          candidatesPlaces={candidatePlaces ?? []}
+          promiseId={promiseId}
           isOpen={isSheetOpen}
           onClose={handleSheetClose}
-          placeName={selectedPlace.placeName}
-          address={selectedPlace.address}
-          proposedBy={selectedPlace.proposedBy}
-          isAdded={isPendingAdded}
-          onToggleAdd={isAdded =>
-            pendingPlace && handleToggleAdd(isAdded, pendingPlace)
-          }
-          isVoted={isVoted}
-          onToggleVote={isVotedNext =>
-            pendingPlace && handleToggleVote(isVotedNext, pendingPlace)
-          }
+          selectedPlace={selectedPlace}
           isConfirmed={isConfirmed}
         />
       )}

@@ -11,6 +11,9 @@ export interface SelectedPlace {
   placeName: string;
   address: string;
   proposedBy: string;
+  lat: number;
+  lng: number;
+  category?: string;
 }
 
 // 투표 결과 카드 상태
