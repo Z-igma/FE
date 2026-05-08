@@ -15,6 +15,7 @@ export interface PromiseItem {
   promisedAt: string;
   dayOfWeek: string;
   memberCount: number;
+  isLeader: boolean;
 }
 
 // 약속 목록 조회 요청 파라미터

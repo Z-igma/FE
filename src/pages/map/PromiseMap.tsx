@@ -80,8 +80,6 @@ const PromiseMap = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!promise) return null;
-
   const isConfirmed = false; // 확정된 장소 예정
 
   const {data: candidatePlacesResponse} = useGetCandidatePlaces(promiseId);
@@ -93,6 +91,8 @@ const PromiseMap = () => {
       state: { promise, candidatesPlaces: candidatePlaces, votedPlaces: [...votedPlaces], votedPlace },
     });
   };
+
+  if (!promise) return null;
 
   return (
     <div className="fixed inset-0 overflow-hidden">
