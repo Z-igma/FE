@@ -282,7 +282,7 @@ const PromiseMap = () => {
           </div>
 
           {isLeader && isCardExpanded && (
-            <div className="px-3 py-1 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
+            <div className="px-3 py-1 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px] cursor-pointer">
               <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
                 멤버 초대하기
               </p>
