@@ -37,6 +37,7 @@ export interface PromiseMember {
   nickName: string;
   profileImageUrl: string;
   role: 'HOST' | 'GUEST';
+  isSelf: boolean;
 }
 
 // 약속 상세 조회
@@ -48,4 +49,5 @@ export interface PromiseDetail {
   isMultipleVoting: boolean;
   memberCount: number;
   members: PromiseMember[];
+  isLeader: boolean;
 }
