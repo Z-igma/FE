@@ -345,7 +345,7 @@ const PromiseMap = () => {
       )}
 
       {/* 마커가 하나 이상이면 투표 바텀 시트 표시 */}
-      {candidatePlacesCount &&
+      {!!candidatePlacesCount &&
         candidatePlacesCount > 0 &&
         !isCommentMode &&
         !isCommentOpen && (
