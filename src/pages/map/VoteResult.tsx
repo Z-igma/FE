@@ -10,14 +10,13 @@ import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg
 import RevoteMessageIcon from '@/assets/images/revoteMessageIcon.svg';
 
 const VoteResult = () => {
-  const isCreator = false; // 실제 생성자 구분 교체 예정
-
   const navigate = useNavigate();
   const { state } = useLocation();
   const promise = state?.promise;
-  const markers = state?.markers ?? [];
+  const markers = state?.candidatesPlaces ?? [];
   const votedPlaces: string[] = state?.votedPlaces ?? [];
   const votedPlace: string | null = state?.votedPlace ?? null;
+  const isCreator = promise?.isLeader ?? false;
 
   const {
     sortedCandidates,
