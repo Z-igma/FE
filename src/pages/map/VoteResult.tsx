@@ -38,13 +38,12 @@ const VoteResult = () => {
   } = useVoteResult({
     candidatePlaces,
     isMultipleVoting: promise?.isMultipleVoting ?? true,
-    isCreator,
     promiseId,
   });
 
   return (
     <div className="flex flex-col gap-3">
-      <Header title="장소 결정" />
+      <Header title={isCreator ? '장소 결정' : '장소 투표'} />
       <div className="flex flex-col gap-5">
         <div className="flex justify-between px-4">
           <div className="flex flex-col gap-1">
