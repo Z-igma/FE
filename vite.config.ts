@@ -10,6 +10,9 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate', // 새 버전 생기면 자동 업데이트
+        strategies: 'injectManifest',
+        srcDir: 'public',
+        filename: 'sw.js',             
         devOptions: {
           enabled: false, // 개발 중 SW 비활성화
         },
