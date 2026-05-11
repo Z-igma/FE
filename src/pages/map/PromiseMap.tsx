@@ -290,7 +290,7 @@ const PromiseMap = () => {
           <div
             className={`flex ${isCardExpanded ? 'flex-col gap-2' : 'flex-row'}`}
           >
-            {promise.members.map((member, i) => (
+            {members.map((member, i) => (
               <div
                 key={member.userId}
                 className={`flex items-center shrink-0 ${isCardExpanded ? 'gap-2' : ''}`}
