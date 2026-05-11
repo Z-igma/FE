@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   CustomOverlayMap,
   Map,
@@ -20,6 +20,8 @@ import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
 import CommentIcon from '@/assets/images/map/commentIcon.svg';
 import { useGetCandidatePlaces } from './services/useVotePalce';
 import { usePromiseDetail } from './services/usePromiseDetail';
+import { useAuthStore } from '@/stores/authStore';
+import { usePostJoinPromise } from '@/apis/apiHooks/usePromiseInvite';
 
 const PromiseMap = () => {
   const [bounds, setBounds] = useState<GetCommentsParams>({
@@ -29,10 +31,30 @@ const PromiseMap = () => {
     maxLng: 127.04,
   });
 
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get('inviteCode');
   const navigate = useNavigate();
   const { promiseId } = useParams();
   const parsedPromiseId = Number(promiseId);
   const { data: promise } = usePromiseDetail(parsedPromiseId);
+
+  const {accessToken} = useAuthStore();
+
+  const { mutate: joinPromise } = usePostJoinPromise();
+
+  useEffect(() => {
+    if (!inviteCode) return;  // inviteCode 없으면 그냥 일반 접근
+
+    if (!accessToken) {
+      // 로그인 안 됐으면 저장하고 로그인 페이지로
+      sessionStorage.setItem('inviteCode', inviteCode);
+      sessionStorage.setItem('redirectPage', `/map/${promiseId}`);
+      navigate('/login');
+      return;
+    }
+
+    joinPromise(inviteCode);
+  }, [inviteCode, accessToken]);
 
   const { center, isOnline } = useMapLocation();
   const isMultipleVoting = promise?.isMultipleVoting ?? false;
@@ -70,19 +92,34 @@ const PromiseMap = () => {
     openCommentId,
   });
 
-  const [showToast, setShowToast] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const hasCheckedInitial = useRef(false);
   const [isCardExpanded, setIsCardExpanded] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowToast(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const isConfirmed = false; // 확정된 장소 예정
 
   const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
   const candidatePlaces = candidatePlacesResponse?.data.candidates;
-  const candidatePlacesCount = candidatePlacesResponse?.data.count;
+  const candidatePlacesCount = candidatePlacesResponse?.data.candidateCount;
+
+  console.log('candidatePlacesResponse: ', candidatePlacesResponse);
+
+  useEffect(() => {
+    if (!candidatePlacesResponse) return;
+    if (hasCheckedInitial.current) return;
+    
+    hasCheckedInitial.current = true;
+    
+    if (candidatePlacesCount === 0) {
+      setShowToast(true);
+    }
+  }, [candidatePlacesResponse, candidatePlacesCount]);
+
+  useEffect(() => {
+    if (!showToast) return;
+    const timer = setTimeout(() => setShowToast(false), 2000);
+    return () => clearTimeout(timer);
+  }, [showToast]);
 
   const handleGoVoteResult = () => {
     navigate(`/map/${promiseId}/vote`, {
@@ -96,7 +133,7 @@ const PromiseMap = () => {
   };
 
   if (!promise) return null;
-  
+
   const isLeader = promise.isLeader;
 
   return (
@@ -320,12 +357,12 @@ const PromiseMap = () => {
       )}
 
       {/* 마커 없을 때 안내 토스트 */}
-      {showToast && isOnline && !isCommentMode && (
+      {showToast && isOnline && candidatePlacesCount === 0 && (
         <>
           <div className="fixed inset-x-0 top-0 bottom-24 bg-[rgba(17,17,17,0.40)] backdrop-blur-sm flex items-center justify-center z-50" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <ToastMessage
-              title="장소가 없어요"
+              title="추가한 장소가 없어요"
               subTitle="지도를 눌러 추가해 보세요"
             />
           </div>

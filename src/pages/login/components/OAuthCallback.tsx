@@ -17,6 +17,15 @@ const OAuthCallback = () => {
     }
 
     login(accessToken);
+
+    // 초대 링크로 왔었으면
+    const inviteCode = sessionStorage.getItem('inviteCode');
+    const redirectPage = sessionStorage.getItem('redirectPage');
+
+    if (inviteCode && redirectPage) {
+      navigate(`${redirectPage}?inviteCode=${inviteCode}`, { replace: true });
+      return;
+    }
     navigate('/home', { replace: true });
   }, []);
 

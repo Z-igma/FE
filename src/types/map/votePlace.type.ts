@@ -12,7 +12,7 @@ export interface CandidatePlace {
 
 export interface GetCandidatePlacesResponse {
   candidates: CandidatePlace[];
-  count: number;
+  candidateCount: number;
 };
 
 // 투표 후보지 추가 
