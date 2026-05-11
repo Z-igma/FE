@@ -57,9 +57,6 @@ const PromiseMap = () => {
   }, [inviteCode, accessToken]);
 
   const { center, isOnline } = useMapLocation();
-  const isMultipleVoting = promise?.isMultipleVoting ?? false;
-
-  const { votedPlace, votedPlaces } = useVoteState({ isMultipleVoting });
 
   const {
     isCommentMode,
@@ -384,12 +381,8 @@ const PromiseMap = () => {
             isOpen={!isSheetOpen}
             onClose={() => setIsSheetOpen(false)}
             count={candidatePlacesCount}
-            promiseId={promiseId}
-            promise={promise}
             onGoResult={handleGoVoteResult}
             candidatesPlaces={candidatePlaces ?? []}
-            votedPlaces={[...votedPlaces]}
-            votedPlace={votedPlace}
           />
         )}
 
