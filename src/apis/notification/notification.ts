@@ -10,6 +10,6 @@ export const getVapidPublicKey = async (): Promise<ApiEnvelope<GetVapidPublicKey
 
 // 알림 구독
 export const postPushSubscription = async (body: PostPushSubscriptionRequest): Promise<ApiEnvelope<null>> => {
-  const response = await instance.post('/notifications/web-push/subscriptions', body);
+  const response = await instance.post('/notifications/subscriptions', body);
   return response.data;
 };
