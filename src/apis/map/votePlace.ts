@@ -1,6 +1,6 @@
 import { instance } from '../instance';
-import type { ApiEnvelope } from '@/types/api.type';
-import type { AddCandidatePlaceRequest, AddCandidatePlaceResponse, GetCandidatePlacesResponse } from '@/types/map/votePlace.type';
+import type { ApiEnvelope, ApiEnvelopeNullable } from '@/types/api.type';
+import type { AddCandidatePlaceRequest, AddCandidatePlaceResponse, GetCandidatePlacesResponse, PostVoteRequest } from '@/types/map/votePlace.type';
 
 // 투표 후보지 목록 조회
 export const getCandidatePlaces = async (promiseId: string): Promise<ApiEnvelope<GetCandidatePlacesResponse>> => {
@@ -19,3 +19,15 @@ export const deleteCandidatePlace = async (promiseId: string, candidateId: numbe
   const response = await instance.delete(`/promises/${promiseId}/candidates/${candidateId}`);
   return response.data;
 }
+
+// 장소 투표
+export const postVote = async (promiseId: string, body: PostVoteRequest): Promise<ApiEnvelopeNullable<null>> => {
+  const response = await instance.post(`/promises/${promiseId}/votes`, body);
+  return response.data;
+};
+
+// 장소 투표 취소
+export const deleteVote = async (promiseId: string, candidateId: number): Promise<ApiEnvelopeNullable<null>> => {
+  const response = await instance.delete(`/promises/${promiseId}/votes/${candidateId}`);
+  return response.data;
+};
