@@ -6,7 +6,6 @@ import type { Candidate, CardStatus } from '@/types/map';
 interface UseVoteResultProps {
   candidatePlaces: CandidatePlace[];
   isMultipleVoting: boolean;
-  isCreator: boolean;
   promiseId?: string;
 }
 
@@ -19,17 +18,17 @@ export const useVoteResult = ({
   const { mutateAsync: deleteVote } = useDeleteVote(promiseId);
 
   const candidates: Candidate[] = candidatePlaces.map(c => ({
-  id: c.id,
-  name: c.name,
-  distance: c.distance,
-  address: c.address,
-  createMember: c.voteInfo.creator.nickname,
-  voteMember: c.voteInfo.voters
-    .filter(v => v.userId !== c.voteInfo.creator.userId) // creator 제외
-    .map(v => v.nickname)
-    .join(', '),
-  voteCount: c.voteInfo.voteCount,
-}));
+    id: c.id,
+    name: c.name,
+    distance: c.distance,
+    address: c.address,
+    createMember: c.voteInfo.creator.nickname,
+    voteMember: c.voteInfo.voters
+      .filter(v => v.userId !== c.voteInfo.creator.userId)
+      .map(v => v.nickname)
+      .join(', '),
+    voteCount: c.voteInfo.voteCount,
+  }));
 
   const hasVote = candidates.some(c => c.voteCount > 0);
   const maxVote = Math.max(0, ...candidates.map(c => c.voteCount));
@@ -43,41 +42,50 @@ export const useVoteResult = ({
 
   const [isRevote, setIsRevote] = useState(false);
   const isRevoteTie = false;
-  const [hasVoted, setHasVoted] = useState(false);
-  const [myVote, setMyVote] = useState<number[]>([]);
+
+  // isMyVote로 초기 투표 상태 세팅
+  const initialMyVote = candidatePlaces
+    .filter(c => c.voteInfo.isMyVote)
+    .map(c => c.id);
+
+  const [hasVoted, setHasVoted] = useState(initialMyVote.length > 0);
+  const [myVote, setMyVote] = useState<number[]>(initialMyVote);
+  const [previousVote, setPreviousVote] = useState<number[]>(initialMyVote);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmedCandidate, setConfirmedCandidate] =
-    useState<Candidate | null>(null);
+  const [confirmedCandidate, setConfirmedCandidate] = useState<Candidate | null>(null);
 
   const handleSelect = (id: number) => {
     if (isMultipleVoting) {
-      setMyVote(prev =>
-        prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id],
-      );
+      setMyVote(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
     } else {
-      setMyVote(prev => (prev.includes(id) ? [] : [id]));
+      setMyVote(prev => prev.includes(id) ? [] : [id]);
     }
   };
 
-  // 단일/복수 투표 제출
+  // 기존 투표 취소 후 새로 투표
   const handleVoteSubmit = async () => {
     if (myVote.length === 0) return;
     try {
+      if (previousVote.length > 0) {
+        await Promise.all(previousVote.map(id => deleteVote(id)));
+      }
       await Promise.all(myVote.map(id => postVote({ candidateId: id })));
+      setPreviousVote(myVote);
       setHasVoted(true);
     } catch {
-      // 에러는 usePostVote onError에서 처리
+        // 에러는 usePostVote onError에서 처리
     }
   };
 
-  // 단일/복수 투표 취소
+  // 투표 취소
   const handleVoteCancel = async () => {
     try {
       await Promise.all(myVote.map(id => deleteVote(id)));
+      setPreviousVote([]);
       setHasVoted(false);
       setMyVote([]);
     } catch {
-      // 에러는 useDeleteVote onError에서 처리
+       // 에러는 useDeleteVote onError에서 처리
     }
   };
 
@@ -105,8 +113,8 @@ export const useVoteResult = ({
     } else {
       const target =
         myVote.length > 0
-          ? candidates.find(c => c.id === myVote[0])
-          : topCandidates[0];
+        ? candidates.find(c => c.id === myVote[0])
+        : topCandidates[0];
       setConfirmedCandidate(target ?? null);
       setIsConfirmModalOpen(true);
     }
