@@ -142,7 +142,7 @@ const LocationBottomSheet = ({
                 {isAdded && (
                   <div
                     className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${
-                      isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'
+                      isVoted ? 'bg-[#00408E]' : 'bg-[#C6C6C6]'
                     }`}
                     onClick={() => isVoted ? deleteVoteMutate() : postVoteHandler()}
                   >
