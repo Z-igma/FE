@@ -42,10 +42,12 @@ const Home = () => {
           {activePromises.map(promise => (
             <PromiseCard
               key={promise.id}
+              promiseId={promise.id}
               promiseStatus={promise.promiseStatus}
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
+              isLeader={promise.isLeader}
               onClick={() =>
                 navigate(`/map/${promise.id}`, { state: { promise } })
               }
@@ -62,10 +64,12 @@ const Home = () => {
           {pastPromises.map(promise => (
             <PromiseCard
               key={promise.id}
+              promiseId={promise.id}
               promiseStatus={promise.promiseStatus}
               title={promise.title}
               date={formatDate(promise.promisedAt, promise.dayOfWeek)}
               memberCount={promise.memberCount}
+              isPast={true}
               onClick={() =>
                 navigate(`/map/${promise.id}`, { state: { promise } })
               }

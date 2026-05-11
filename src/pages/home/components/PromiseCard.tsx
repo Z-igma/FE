@@ -1,24 +1,33 @@
+import { usePostPromiseInviteCode } from '@/apis/apiHooks/usePromiseInvite';
 import CardMemberIcon from '@/assets/images/cardMemberIcon.svg';
 import CardDetailButtonIcon from '@/assets/images/home/cardDetailButtonIcon.svg';
 import MemberInvitePlusIcon from '@/assets/images/home/memberInvitePlusIcon.svg';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 
 interface PromiseCardProps {
+  promiseId: number;
   promiseStatus: string;
   title: string;
   date: string;
   memberCount: number;
+  isLeader?: boolean;
+  isPast?: boolean;
   onClick?: () => void;
 }
 
 const PromiseCard = ({
+  promiseId,
   promiseStatus,
   title,
   date,
   memberCount,
+  isLeader,
+  isPast,
   onClick,
 }: PromiseCardProps) => {
-  const isCompleted = promiseStatus === '확정 완료';
+  const isCompleted = promiseStatus === '확정 완료' || isPast;
+
+  const { mutate: postPromiseInviteCodeHandler } = usePostPromiseInviteCode();
 
   return (
     <div
@@ -40,12 +49,14 @@ const PromiseCard = ({
       {!isCompleted &&
         (memberCount === 1 ? (
           <div className="flex w-full justify-between gap-15">
-            <div className="flex items-center p-1.5 w-full bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
-              <img src={MemberInvitePlusIcon} />
-              <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
-                친구를 초대하기
-              </p>
-            </div>
+            {isLeader && (
+              <div onClick={(e) => {e.stopPropagation(); postPromiseInviteCodeHandler(promiseId.toString())}} className="flex items-center p-1.5 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
+                <img src={MemberInvitePlusIcon} />
+                <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
+                  친구를 초대하기
+                </p>
+              </div>
+            )}
             <div className="w-7.5 h-7.5 shrink-0 flex items-center justify-center bg-[#E4E4E4] rounded-full">
               <img src={CardDetailButtonIcon} />
             </div>
@@ -63,6 +74,19 @@ const PromiseCard = ({
             </div>
           </div>
         ))}
+        {isPast && (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-1.25">
+              <img src={CardMemberIcon} />
+              <p className="text-[#111111] font-Pretendard font-regular text-[0.875rem] leading-5">
+                {memberCount}명
+              </p>
+            </div>
+            <div className="w-7.5 h-7.5 flex items-center justify-center bg-[#E4E4E4] rounded-full">
+              <img src={CardDetailButtonIcon} />
+            </div>
+          </div>
+        )}
     </div>
   );
 };
