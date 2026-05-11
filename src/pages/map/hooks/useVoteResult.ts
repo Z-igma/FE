@@ -1,39 +1,29 @@
 import { useState } from 'react';
-import type { Marker, Candidate, CardStatus } from '@/types/map';
+import type { CandidatePlace } from '@/types/map/votePlace.type';
+import type { Candidate, CardStatus } from '@/types/map';
 
 interface UseVoteResultProps {
-  markers: Marker[];
-  votedPlaces: string[];
-  votedPlace: string | null;
+  candidatePlaces: CandidatePlace[];
   isMultipleVoting: boolean;
+  isCreator: boolean;
 }
 
 export const useVoteResult = ({
-  markers,
-  votedPlaces,
-  votedPlace,
+  candidatePlaces,
   isMultipleVoting,
 }: UseVoteResultProps) => {
-  const getVoteCount = (marker: Marker): number => {
-    const key = `${marker.lat}_${marker.lng}`;
-    if (isMultipleVoting) {
-      return votedPlaces.filter(k => k === key).length;
-    }
-    return votedPlace === key ? 1 : 0;
-  };
-
-  const candidates: Candidate[] = markers.map((marker, index) => ({
-    id: index,
-    name: marker.placeName,
-    distance: 0,
-    address: marker.address,
-    createMember: '나',
-    voteMember: '',
-    voteCount: getVoteCount(marker),
+  const candidates: Candidate[] = candidatePlaces.map(c => ({
+    id: c.id,
+    name: c.name,
+    distance: c.distance,
+    address: c.address,
+    createMember: c.voteInfo.creator.nickname,
+    voteMember: c.voteInfo.voters.map(v => v.nickname).join(', '),
+    voteCount: c.voteInfo.voteCount,
   }));
 
   const hasVote = candidates.some(c => c.voteCount > 0);
-  const maxVote = Math.max(...candidates.map(c => c.voteCount));
+  const maxVote = Math.max(0, ...candidates.map(c => c.voteCount));
   const topCandidates = candidates.filter(c => c.voteCount === maxVote);
   const isTie = hasVote && topCandidates.length > 1;
 
@@ -42,7 +32,7 @@ export const useVoteResult = ({
     return isTie ? 'tie' : 'best';
   };
 
-  const [isRevote, setIsRevote] = useState(true);
+  const [isRevote, setIsRevote] = useState(false);
   const isRevoteTie = false;
   const [hasVoted, setHasVoted] = useState(false);
   const [myVote, setMyVote] = useState<number[]>([]);
@@ -62,7 +52,7 @@ export const useVoteResult = ({
   };
 
   const handleVoteSubmit = () => {
-    if (myVote === null) return;
+    if (myVote.length === 0) return;
     console.log('투표 제출 candidateId: ', myVote);
     setHasVoted(true);
   };
@@ -70,7 +60,7 @@ export const useVoteResult = ({
   const handleVoteCancel = () => {
     setHasVoted(false);
     setMyVote([]);
-    console.log('투표 취소 candidateId: ', myVote);
+    console.log('투표 취소');
   };
 
   const displayCandidates = isRevote

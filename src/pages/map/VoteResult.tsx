@@ -13,9 +13,7 @@ const VoteResult = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const promise = state?.promise;
-  const markers = state?.candidatesPlaces ?? [];
-  const votedPlaces: string[] = state?.votedPlaces ?? [];
-  const votedPlace: string | null = state?.votedPlace ?? null;
+  const candidatePlaces = state?.candidatesPlaces ?? [];
   const isCreator = promise?.isLeader ?? false;
 
   const {
@@ -34,10 +32,9 @@ const VoteResult = () => {
     handleVoteCancel,
     handleSelect,
   } = useVoteResult({
-    markers,
-    votedPlaces,
-    votedPlace,
+    candidatePlaces,
     isMultipleVoting: promise?.isMultipleVoting ?? true,
+    isCreator,
   });
 
   return (
