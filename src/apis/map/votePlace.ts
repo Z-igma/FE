@@ -34,6 +34,6 @@ export const deleteVote = async (promiseId: string, candidateId: number): Promis
 
 // 장소 확정
 export const confirmPlace = async (promiseId: string, body: ConfirmPlaceRequest): Promise<ApiEnvelopeNullable<null>> => {
-  const response = await instance.post(`/promises/${promiseId}/confirm`, body);
+  const response = await instance.post(`/promises/${promiseId}/confirmed`, body);
   return response.data;
 };
