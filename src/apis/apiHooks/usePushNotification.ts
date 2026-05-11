@@ -12,6 +12,14 @@ const urlBase64ToUint8Array = (base64String: string) => {
 export const usePushNotification = () => {
   const subscribePushNotification = async () => {
     try {
+      // 알림 권한 요청
+      const permission = await Notification.requestPermission();
+      
+      if (permission !== 'granted') {
+        alert('알림 권한을 허용해야 알림을 받을 수 있어요!');
+        return;
+      }
+
       const vapidPublicKeyResponse = await getVapidPublicKey();
       const vapidPublicKey = vapidPublicKeyResponse.data.publicKey;
       const convertedKey = urlBase64ToUint8Array(vapidPublicKey);
