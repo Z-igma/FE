@@ -12,7 +12,6 @@ import CommentBottomSheet from './components/CommentBottomSheet';
 import LocationMarker from './components/LocationMarker';
 import ToastMessage from '@/components/common/ToastMessage';
 import { useMapLocation } from './hooks/useMapLocation';
-import { useVoteState } from './hooks/useVoteState';
 import { useMapSheet } from './hooks/useMapSheet';
 import { useComment } from './hooks/useComment';
 import type { GetCommentsParams } from '@/types/map/comment.type';
