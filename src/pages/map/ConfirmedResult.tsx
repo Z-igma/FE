@@ -1,20 +1,29 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import CandidatesCard from './components/CandidatesCard';
 import CommonModal from '@/components/modal/CommonModal';
 import PromiseStatusBadge from '@/components/common/PromiseStatusBadge';
 import Header from '@/components/layout/Header';
+import { usePromiseDetail } from './services/usePromiseDetail';
+import { useGetCandidatePlaces } from './services/useVotePalce';
 
 const ConfirmedResult = () => {
-  const { state } = useLocation();
-  const promise = state?.promise;
-  const candidate = state?.confirmedCandidate;
+  const { promiseId } = useParams();
+  const parsedPromiseId = Number(promiseId);
+  const { data: promise } = usePromiseDetail(parsedPromiseId);
+  const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
+  const candidate = candidatePlacesResponse?.data.candidates.find(c => c.isConfirmed);
 
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
 
-  // 약속 날짜가 오늘인지 여부
-  const today =
-    new Date().toDateString() === new Date(promise.date).toDateString();
+  if (!promise || !candidate) return null;
+
+  const today = new Date().toDateString() === new Date(promise.promisedAt).toDateString();
+  const time = new Date(promise.promisedAt).toLocaleTimeString('ko-KR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 
   return (
     <div className="flex flex-col gap-3">
@@ -42,7 +51,7 @@ const ConfirmedResult = () => {
                   {promise.dayOfWeek}요일 {promise.title}
                 </p>
                 <p className="text-[#FFFFFF] font-Pretendard font-regular text-[1rem] leading-4">
-                  19:00
+                  {time}
                 </p>
               </div>
             </div>
@@ -56,9 +65,12 @@ const ConfirmedResult = () => {
             name={candidate.name}
             distance={candidate.distance}
             address={candidate.address}
-            createMember={candidate.createMember}
-            voteMember={candidate.voteMember}
-            voteCount={candidate.voteCount}
+            createMember={candidate.voteInfo.creator.nickname}
+            voteMember={candidate.voteInfo.voters
+              .filter(v => v.userId !== candidate.voteInfo.creator.userId)
+              .map(v => v.nickname)
+              .join(', ')}
+            voteCount={candidate.voteInfo.voteCount}
             memberCount={promise.memberCount}
           />
         </div>
@@ -76,7 +88,6 @@ const ConfirmedResult = () => {
           ) : (
             <button
               className="flex-1 py-4 border border-[#C6C6C6] rounded-[10px] bg-[#FFFFFF] active:bg-[#00408E]"
-              // 예약 확인 연결 예정
             >
               <p className="text-[#111111] font-Pretendard font-normal text-[1rem] leading-4 active:text-[#FFFFFF]">
                 예약 확인
@@ -86,7 +97,6 @@ const ConfirmedResult = () => {
 
           <button
             className="flex-1 py-4 border border-[#C6C6C6] rounded-[10px] bg-[#FFFFFF] active:bg-[#00408E]"
-            // 길찾기 링크 연결 예정
           >
             <p className="text-[#111111] font-Pretendard font-normal text-[1rem] leading-4 active:text-[#FFFFFF]">
               길찾기
@@ -103,9 +113,7 @@ const ConfirmedResult = () => {
             subText="약속을 캘린더에 저장하려면 설정에서 권한을 허용해 주세요"
             confirmText="설정 열기"
             closeText="취소"
-            onConfirm={() => {
-              setIsCalendarModalOpen(true);
-            }}
+            onConfirm={() => setIsCalendarModalOpen(true)}
             onClose={() => setIsCalendarModalOpen(false)}
           />
         </div>

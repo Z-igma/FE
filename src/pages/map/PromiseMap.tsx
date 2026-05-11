@@ -96,13 +96,13 @@ const PromiseMap = () => {
   const hasCheckedInitial = useRef(false);
   const [isCardExpanded, setIsCardExpanded] = useState(false);
 
-  const isConfirmed = false; // 확정된 장소 예정
-
   const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
   const candidatePlaces = candidatePlacesResponse?.data.candidates;
   const candidatePlacesCount = candidatePlacesResponse?.data.candidateCount;
 
   console.log('candidatePlacesResponse: ', candidatePlacesResponse);
+  
+  const isConfirmed = candidatePlaces?.some(c => c.isConfirmed) ?? false;
 
   useEffect(() => {
     if (!candidatePlacesResponse) return;

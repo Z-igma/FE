@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addCandidatePlace, deleteCandidatePlace, deleteVote, getCandidatePlaces, postVote } from '@/apis/map/votePlace';
-import type { AddCandidatePlaceRequest, PostVoteRequest } from '@/types/map/votePlace.type';
+import { addCandidatePlace, confirmPlace, deleteCandidatePlace, deleteVote, getCandidatePlaces, postVote } from '@/apis/map/votePlace';
+import type { AddCandidatePlaceRequest, ConfirmPlaceRequest, PostVoteRequest } from '@/types/map/votePlace.type';
 import axios from 'axios';
 
 // 투표 후보지 목록 조회
@@ -105,4 +105,22 @@ export const useDeleteVote = (promiseId?: string) => {
       console.error('투표 취소 실패: ', error);
     }
   })
+};
+
+// 장소 확정
+export const useConfirmPlace = (promiseId?: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ConfirmPlaceRequest) => {
+      if (!promiseId) return Promise.reject(new Error("Promise ID is required"));
+      return confirmPlace(promiseId, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['candidatePlaces', promiseId] });
+      queryClient.invalidateQueries({ queryKey: ['promise', Number(promiseId)] });
+    },
+    onError: (error) => {
+      console.error('장소 확정 실패: ', error);
+    },
+  });
 };

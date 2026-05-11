@@ -37,9 +37,7 @@ const Promise = () => {
             title={promise.title}
             date={formatDate(promise.promisedAt, promise.dayOfWeek)}
             memberCount={promise.memberCount}
-            onClick={() =>
-              navigate(`/map/${promise.id}/confirmed`, { state: { promise } })
-            }
+            onClick={() => navigate(`/map/${promise.id}/confirmed`)}
           />
         ))}
       </div>

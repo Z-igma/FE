@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { usePostVote, useDeleteVote } from '../services/useVotePalce';
+import { usePostVote, useDeleteVote, useConfirmPlace } from '../services/useVotePalce';
 import type { CandidatePlace } from '@/types/map/votePlace.type';
 import type { Candidate, CardStatus } from '@/types/map';
 
@@ -16,6 +16,8 @@ export const useVoteResult = ({
 }: UseVoteResultProps) => {
   const { mutateAsync: postVote } = usePostVote(promiseId);
   const { mutateAsync: deleteVote } = useDeleteVote(promiseId);
+  const { mutateAsync: confirmPlace } = useConfirmPlace(promiseId);
+
 
   const candidates: Candidate[] = candidatePlaces.map(c => ({
     id: c.id,
@@ -111,14 +113,21 @@ export const useVoteResult = ({
     if (isTie && !isRevote && !isRevoteTie) {
       setIsRevote(true);
     } else {
-      const target =
-        myVote.length > 0
+      const target = myVote.length > 0
         ? candidates.find(c => c.id === myVote[0])
         : topCandidates[0];
       setConfirmedCandidate(target ?? null);
       setIsConfirmModalOpen(true);
     }
   };
+
+  // 모달에서 확정하기 누를 때 호출할 함수
+  const handleConfirm = async (candidateId: number) => {
+    try {
+      await confirmPlace({ candidateId });
+    } catch {}
+  };
+
 
   return {
     sortedCandidates,
@@ -136,5 +145,6 @@ export const useVoteResult = ({
     handleVoteSubmit,
     handleVoteCancel,
     handleSelect,
+    handleConfirm
   };
 };
