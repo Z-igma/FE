@@ -12,7 +12,6 @@ import CommentBottomSheet from './components/CommentBottomSheet';
 import LocationMarker from './components/LocationMarker';
 import ToastMessage from '@/components/common/ToastMessage';
 import { useMapLocation } from './hooks/useMapLocation';
-import { useVoteState } from './hooks/useVoteState';
 import { useMapSheet } from './hooks/useMapSheet';
 import { useComment } from './hooks/useComment';
 import type { GetCommentsParams } from '@/types/map/comment.type';
@@ -57,9 +56,6 @@ const PromiseMap = () => {
   }, [inviteCode, accessToken]);
 
   const { center, isOnline } = useMapLocation();
-  const isMultipleVoting = promise?.isMultipleVoting ?? false;
-
-  const { votedPlace, votedPlaces } = useVoteState({ isMultipleVoting });
 
   const {
     isCommentMode,
@@ -96,13 +92,13 @@ const PromiseMap = () => {
   const hasCheckedInitial = useRef(false);
   const [isCardExpanded, setIsCardExpanded] = useState(false);
 
-  const isConfirmed = false; // 확정된 장소 예정
-
   const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
   const candidatePlaces = candidatePlacesResponse?.data.candidates;
   const candidatePlacesCount = candidatePlacesResponse?.data.candidateCount;
 
   console.log('candidatePlacesResponse: ', candidatePlacesResponse);
+  
+  const isConfirmed = candidatePlaces?.some(c => c.isConfirmed) ?? false;
 
   useEffect(() => {
     if (!candidatePlacesResponse) return;
@@ -384,12 +380,8 @@ const PromiseMap = () => {
             isOpen={!isSheetOpen}
             onClose={() => setIsSheetOpen(false)}
             count={candidatePlacesCount}
-            promiseId={promiseId}
-            promise={promise}
             onGoResult={handleGoVoteResult}
             candidatesPlaces={candidatePlaces ?? []}
-            votedPlaces={[...votedPlaces]}
-            votedPlace={votedPlace}
           />
         )}
 

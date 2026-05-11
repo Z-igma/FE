@@ -52,3 +52,8 @@ export interface AddCandidatePlaceResponse {
 export interface PostVoteRequest {
   candidateId: number;
 };
+
+// 장소 확정
+export interface ConfirmPlaceRequest {
+  candidateId: number;
+}

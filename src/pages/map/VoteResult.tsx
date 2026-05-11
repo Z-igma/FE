@@ -35,16 +35,16 @@ const VoteResult = () => {
     handleVoteSubmit,
     handleVoteCancel,
     handleSelect,
+    handleConfirm
   } = useVoteResult({
     candidatePlaces,
     isMultipleVoting: promise?.isMultipleVoting ?? true,
-    isCreator,
     promiseId,
   });
 
   return (
     <div className="flex flex-col gap-3">
-      <Header title="장소 결정" />
+      <Header title={isCreator ? '장소 결정' : '장소 투표'} />
       <div className="flex flex-col gap-5">
         <div className="flex justify-between px-4">
           <div className="flex flex-col gap-1">
@@ -117,11 +117,11 @@ const VoteResult = () => {
             questionText="이 장소를 확정할까요?"
             mainText={confirmedCandidate.name}
             subText="확정 시 모든 멤버에게 알림이 전송됩니다"
-            onConfirm={() => {
+            onConfirm={async () => {
+              if (!confirmedCandidate) return;
+              await handleConfirm(confirmedCandidate.id);
               setIsConfirmModalOpen(false);
-              navigate(`/map/${promise?.id}/confirmed`, {
-                state: { promise, confirmedCandidate },
-              });
+              navigate(`/map/${promiseId}/confirmed`);
             }}
             onClose={() => setIsConfirmModalOpen(false)}
             confirmText="확정하기"
