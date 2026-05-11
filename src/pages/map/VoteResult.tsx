@@ -59,7 +59,7 @@ const VoteResult = () => {
             </div>
           </div>
           <div>
-            <PromiseStatusBadge status={promise?.promiseStatus} />
+            <PromiseStatusBadge status={promise?.promiseStatus ?? ''} />
           </div>
         </div>
 
@@ -86,7 +86,7 @@ const VoteResult = () => {
                 createMember={candidate.createMember}
                 voteMember={candidate.voteMember}
                 voteCount={candidate.voteCount}
-                memberCount={promise?.memberCount}
+                memberCount={promise?.memberCount ?? 0}
               />
             ))}
           </div>
@@ -119,7 +119,7 @@ const VoteResult = () => {
             subText="확정 시 모든 멤버에게 알림이 전송됩니다"
             onConfirm={() => {
               setIsConfirmModalOpen(false);
-              navigate(`/map/${promise.id}/confirmed`, {
+              navigate(`/map/${promise?.id}/confirmed`, {
                 state: { promise, confirmedCandidate },
               });
             }}

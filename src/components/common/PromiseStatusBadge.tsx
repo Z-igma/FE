@@ -20,10 +20,12 @@ const STATUS_CONFIG: Record<
 };
 
 interface PromiseStatusBadgeProps {
-  status: string;
+  status?: string;
 }
 
 const PromiseStatusBadge = ({ status }: PromiseStatusBadgeProps) => {
+    if (!status) return null;
+
   const config = STATUS_CONFIG[status] ?? {
     dot: 'bg-[#B2B2B2]',
     badge: 'bg-[#B2B2B2] text-[#FFFFFF]',
