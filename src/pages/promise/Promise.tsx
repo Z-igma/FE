@@ -32,6 +32,7 @@ const Promise = () => {
         {upcomingConfirmedPromises.map(promise => (
           <PromiseCard
             key={promise.id}
+            promiseId={promise.id}
             promiseStatus={promise.promiseStatus}
             title={promise.title}
             date={formatDate(promise.promisedAt, promise.dayOfWeek)}
