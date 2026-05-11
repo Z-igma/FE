@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { usePushNotification } from '@/apis/apiHooks/usePushNotification';
 
 const OAuthCallback = () => {
   const [searchParams] = useSearchParams();
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const { subscribePushNotification } = usePushNotification();
 
   useEffect(() => {
     const accessToken = searchParams.get('accessToken');
@@ -17,6 +19,7 @@ const OAuthCallback = () => {
     }
 
     login(accessToken);
+    subscribePushNotification();
 
     // 초대 링크로 왔었으면
     const inviteCode = sessionStorage.getItem('inviteCode');
