@@ -51,4 +51,5 @@ export interface PromiseDetail {
   memberCount: number;
   members: PromiseMember[];
   isLeader: boolean;
+  promiseStatus: string;
 }

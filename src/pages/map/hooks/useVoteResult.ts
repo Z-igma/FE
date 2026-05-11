@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePostVote, useDeleteVote } from '../services/useVotePalce';
 import type { CandidatePlace } from '@/types/map/votePlace.type';
 import type { Candidate, CardStatus } from '@/types/map';
 
@@ -6,12 +7,17 @@ interface UseVoteResultProps {
   candidatePlaces: CandidatePlace[];
   isMultipleVoting: boolean;
   isCreator: boolean;
+  promiseId?: string;
 }
 
 export const useVoteResult = ({
   candidatePlaces,
   isMultipleVoting,
+  promiseId,
 }: UseVoteResultProps) => {
+  const { mutateAsync: postVote } = usePostVote(promiseId);
+  const { mutateAsync: deleteVote } = useDeleteVote(promiseId);
+
   const candidates: Candidate[] = candidatePlaces.map(c => ({
     id: c.id,
     name: c.name,
@@ -40,7 +46,6 @@ export const useVoteResult = ({
   const [confirmedCandidate, setConfirmedCandidate] =
     useState<Candidate | null>(null);
 
-  // 후보지 토글
   const handleSelect = (id: number) => {
     if (isMultipleVoting) {
       setMyVote(prev =>
@@ -51,16 +56,26 @@ export const useVoteResult = ({
     }
   };
 
-  const handleVoteSubmit = () => {
+  // 단일/복수 투표 제출
+  const handleVoteSubmit = async () => {
     if (myVote.length === 0) return;
-    console.log('투표 제출 candidateId: ', myVote);
-    setHasVoted(true);
+    try {
+      await Promise.all(myVote.map(id => postVote({ candidateId: id })));
+      setHasVoted(true);
+    } catch {
+      // 에러는 usePostVote onError에서 처리
+    }
   };
 
-  const handleVoteCancel = () => {
-    setHasVoted(false);
-    setMyVote([]);
-    console.log('투표 취소');
+  // 단일/복수 투표 취소
+  const handleVoteCancel = async () => {
+    try {
+      await Promise.all(myVote.map(id => deleteVote(id)));
+      setHasVoted(false);
+      setMyVote([]);
+    } catch {
+      // 에러는 useDeleteVote onError에서 처리
+    }
   };
 
   const displayCandidates = isRevote
@@ -71,7 +86,6 @@ export const useVoteResult = ({
     (a, b) => b.voteCount - a.voteCount,
   );
 
-  // 방장 버튼 텍스트
   const buttonText = isRevoteTie
     ? '임의로 장소 확정하기'
     : isRevote
@@ -82,7 +96,6 @@ export const useVoteResult = ({
 
   const buttonDisabled = isRevote ? false : !hasVote;
 
-  // 방장이 확정
   const handleConfirmClick = () => {
     if (isTie && !isRevote && !isRevoteTie) {
       setIsRevote(true);

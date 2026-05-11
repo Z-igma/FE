@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import CandidatesCard from './components/CandidatesCard';
 import CommonModal from '@/components/modal/CommonModal';
 import BottomButton from '@/components/common/BottomButton';
@@ -8,12 +8,16 @@ import { useVoteResult } from './hooks/useVoteResult';
 import FixBottomLayout from '@/components/layout/FixBottomLayout';
 import CandidateVoteMemberIcon from '@/assets/images/candidateVoteMemberIcon.svg';
 import RevoteMessageIcon from '@/assets/images/revoteMessageIcon.svg';
+import { useGetCandidatePlaces } from './services/useVotePalce';
+import { usePromiseDetail } from './services/usePromiseDetail';
 
 const VoteResult = () => {
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const promise = state?.promise;
-  const candidatePlaces = state?.candidatesPlaces ?? [];
+  const { promiseId } = useParams();
+  const parsedPromiseId = Number(promiseId);
+  const { data: promise } = usePromiseDetail(parsedPromiseId);
+  const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
+  const candidatePlaces = candidatePlacesResponse?.data.candidates ?? [];
   const isCreator = promise?.isLeader ?? false;
 
   const {
@@ -35,6 +39,7 @@ const VoteResult = () => {
     candidatePlaces,
     isMultipleVoting: promise?.isMultipleVoting ?? true,
     isCreator,
+    promiseId,
   });
 
   return (

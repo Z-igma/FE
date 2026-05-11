@@ -37,11 +37,15 @@ const LocationBottomSheet = ({
 
   const height = isError ? 'h-60' : isConfirmed ? 'h-60' : 'h-45';
 
-  const isAdded = candidatesPlaces.some(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address);
-  const isVoted = candidatesPlaces.find(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address)?.voteInfo.isMyVote;
-  const selectedPlaceId = candidatesPlaces.find(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address)?.id;
+  const isAdded = candidatesPlaces.some(c => c.name === selectedPlace.placeName && c.address === selectedPlace.address);
+  const matched = candidatesPlaces.find(c => c.name === selectedPlace.placeName && c.address === selectedPlace.address);
+  const isVoted = matched?.voteInfo.isMyVote;
+  const selectedPlaceId = matched?.id;
 
-  const {mutate: addCandidatePlaceMutate} = useAddCandidatePlace(promiseId);
+  const { mutate: addCandidatePlaceMutate } = useAddCandidatePlace(promiseId);
+  const { mutate: deleteCandidatePlaceMutate } = useDeleteCandidatePlace(promiseId, selectedPlaceId);
+  const { mutate: postVoteMutate } = usePostVote(promiseId);
+  const { mutate: deleteVoteMutate } = useDeleteVote(promiseId); // candidateId 제거
 
   const addCandidatePlaceHandler = () => {
     addCandidatePlaceMutate({
@@ -52,9 +56,6 @@ const LocationBottomSheet = ({
       category: selectedPlace.category || "",
     });
   };
-
-  
-  const {mutate: deleteCandidatePlaceMutate} = useDeleteCandidatePlace(promiseId, selectedPlaceId);
 
   const deleteCandidatePlaceHandler = () => {
     deleteCandidatePlaceMutate(undefined, {
@@ -69,21 +70,15 @@ const LocationBottomSheet = ({
     });
   }
 
-  const {mutate: postVoteMutate} = usePostVote(promiseId);
   const postVoteHandler = () => {
     if (!selectedPlaceId) return;
-    console.log('selectedPlaceId: ', selectedPlaceId);
-    console.log("Clicked");
-
-    postVoteMutate({
-      candidateId: selectedPlaceId,
-    });
+    postVoteMutate({ candidateId: selectedPlaceId });
   };
 
-  const {mutate: deleteVoteMutate} = useDeleteVote(promiseId, selectedPlaceId);
-
-  console.log(selectedPlace);
-  console.log(candidatesPlaces)
+  const deleteVoteHandler = () => {
+    if (!selectedPlaceId) return;
+    deleteVoteMutate(selectedPlaceId); // candidateId를 인자로 전달
+  };
 
   return (
     <BottomSheet
@@ -141,10 +136,8 @@ const LocationBottomSheet = ({
               <div className="flex gap-5">
                 {isAdded && (
                   <div
-                    className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${
-                      isVoted ? 'bg-[#00408E]' : 'bg-[#C6C6C6]'
-                    }`}
-                    onClick={() => isVoted ? deleteVoteMutate() : postVoteHandler()}
+                    className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${isVoted ? 'bg-[#00408E]' : 'bg-[#C6C6C6]'}`}
+                    onClick={() => isVoted ? deleteVoteHandler() : postVoteHandler()}
                   >
                     <img src={VoteIcon} />
                   </div>

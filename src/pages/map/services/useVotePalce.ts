@@ -26,11 +26,11 @@ export const useAddCandidatePlace = (promiseId?: string) => {
       if (!promiseId) {
         return Promise.reject(new Error("Promise ID is required"));
       } else {
-        return addCandidatePlace(promiseId, body);
+      return addCandidatePlace(promiseId, body);
       }
     },
     onSuccess: res => {
-      console.log('투표 후보지 추가 성공: ', res); 
+      console.log('투표 후보지 추가 성공: ', res);
       queryClient.invalidateQueries({ queryKey: ['candidatePlaces', promiseId] });
     },
     onError: error => { console.error('투표 후보지 추가 실패: ', error); },
@@ -46,7 +46,7 @@ export const useDeleteCandidatePlace = (promiseId?: string, candidateId?: number
       if (!promiseId || !candidateId) {
         return Promise.reject(new Error("Promise ID is required"));
       } else {
-        return deleteCandidatePlace(promiseId, candidateId);
+      return deleteCandidatePlace(promiseId, candidateId);
       }
     },
     onSuccess: res => {
@@ -89,14 +89,12 @@ export const usePostVote = (promiseId?: string) => {
 };
 
 // 장소 투표 취소
-export const useDeleteVote = (promiseId?: string, candidateId?: number) => {
+export const useDeleteVote = (promiseId?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => {
-      if (!promiseId || !candidateId) {
-        return Promise.reject(new Error("Promise ID is required"));
-      }
+    mutationFn: (candidateId: number) => {
+      if (!promiseId) return Promise.reject(new Error("Promise ID is required"));
       return deleteVote(promiseId, candidateId);
     },
     onSuccess: () => {

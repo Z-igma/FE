@@ -107,9 +107,9 @@ const PromiseMap = () => {
   useEffect(() => {
     if (!candidatePlacesResponse) return;
     if (hasCheckedInitial.current) return;
-    
+
     hasCheckedInitial.current = true;
-    
+
     if (candidatePlacesCount === 0) {
       setShowToast(true);
     }
@@ -122,14 +122,7 @@ const PromiseMap = () => {
   }, [showToast]);
 
   const handleGoVoteResult = () => {
-    navigate(`/map/${promiseId}/vote`, {
-      state: {
-        promise,
-        candidatesPlaces: candidatePlaces,
-        votedPlaces: [...votedPlaces],
-        votedPlace,
-      },
-    });
+    navigate(`/map/${promiseId}/vote`);
   };
 
   if (!promise) return null;
