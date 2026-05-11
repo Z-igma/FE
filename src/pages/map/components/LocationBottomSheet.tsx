@@ -6,7 +6,7 @@ import PlusIcon from '@/assets/images/plusIcon.svg';
 import NomineeMinusIcon from '@/assets/images/map/nomineeMinusIcon.svg';
 import VoteIcon from '@/assets/images/map/voteIcon.svg';
 import WarningIcon from '@/assets/images/warningIcon.svg';
-import { useAddCandidatePlace, useDeleteCandidatePlace } from '../services/useVotePalce';
+import { useAddCandidatePlace, useDeleteCandidatePlace, useDeleteVote, usePostVote } from '../services/useVotePalce';
 import type { CandidatePlace } from '@/types/map/votePlace.type';
 
 interface LocationBottomSheetProps {
@@ -38,7 +38,7 @@ const LocationBottomSheet = ({
   const height = isError ? 'h-60' : isConfirmed ? 'h-60' : 'h-45';
 
   const isAdded = candidatesPlaces.some(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address);
-  const isVoted = candidatesPlaces.some(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address);
+  const isVoted = candidatesPlaces.find(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address)?.voteInfo.isMyVote;
   const selectedPlaceId = candidatesPlaces.find(candidatePlace => candidatePlace.name === selectedPlace.placeName && candidatePlace.address === selectedPlace.address)?.id;
 
   const {mutate: addCandidatePlaceMutate} = useAddCandidatePlace(promiseId);
@@ -69,8 +69,21 @@ const LocationBottomSheet = ({
     });
   }
 
+  const {mutate: postVoteMutate} = usePostVote(promiseId);
+  const postVoteHandler = () => {
+    if (!selectedPlaceId) return;
+    console.log('selectedPlaceId: ', selectedPlaceId);
+    console.log("Clicked");
+
+    postVoteMutate({
+      candidateId: selectedPlaceId,
+    });
+  };
+
+  const {mutate: deleteVoteMutate} = useDeleteVote(promiseId, selectedPlaceId);
 
   console.log(selectedPlace);
+  console.log(candidatesPlaces)
 
   return (
     <BottomSheet
@@ -131,7 +144,7 @@ const LocationBottomSheet = ({
                     className={`w-9 h-9 p-1.5 rounded-full cursor-pointer ${
                       isVoted ? 'bg-[#C6C6C6]' : 'bg-[#00408E]'
                     }`}
-                    onClick={() => {}}
+                    onClick={() => isVoted ? deleteVoteMutate() : postVoteHandler()}
                   >
                     <img src={VoteIcon} />
                   </div>
