@@ -289,14 +289,11 @@ const PromiseMap = () => {
             {promise.members.map((member, i) => (
               <div
                 key={member.userId}
-                className={`flex items-center ${isCardExpanded ? 'gap-2' : ''}`}
+                className={`flex items-center ${isCardExpanded ? 'gap-2' : '-ml-1.5 first:ml-0'}`}
               >
                 <img
                   src={member.profileImageUrl ?? ''}
-                  className="w-6 h-6 rounded-full ring-2 ring-white"
-                  style={{
-                    marginLeft: isCardExpanded ? 0 : i === 0 ? 0 : '-4px',
-                  }}
+                  className="w-6 h-6 rounded-full gap-[-4px]"
                   alt="참여자"
                 />
                 {isCardExpanded && (
