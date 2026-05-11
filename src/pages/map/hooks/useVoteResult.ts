@@ -19,14 +19,17 @@ export const useVoteResult = ({
   const { mutateAsync: deleteVote } = useDeleteVote(promiseId);
 
   const candidates: Candidate[] = candidatePlaces.map(c => ({
-    id: c.id,
-    name: c.name,
-    distance: c.distance,
-    address: c.address,
-    createMember: c.voteInfo.creator.nickname,
-    voteMember: c.voteInfo.voters.map(v => v.nickname).join(', '),
-    voteCount: c.voteInfo.voteCount,
-  }));
+  id: c.id,
+  name: c.name,
+  distance: c.distance,
+  address: c.address,
+  createMember: c.voteInfo.creator.nickname,
+  voteMember: c.voteInfo.voters
+    .filter(v => v.userId !== c.voteInfo.creator.userId) // creator 제외
+    .map(v => v.nickname)
+    .join(', '),
+  voteCount: c.voteInfo.voteCount,
+}));
 
   const hasVote = candidates.some(c => c.voteCount > 0);
   const maxVote = Math.max(0, ...candidates.map(c => c.voteCount));
