@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { usePostVote, useDeleteVote, useConfirmPlace } from '../services/useVotePalce';
+import { usePostVote, useDeleteVote, useConfirmPlace, usePostRevote } from '../services/useVotePalce';
 import type { CandidatePlace } from '@/types/map/votePlace.type';
 import type { Candidate, CardStatus } from '@/types/map';
 
@@ -17,7 +17,7 @@ export const useVoteResult = ({
   const { mutateAsync: postVote } = usePostVote(promiseId);
   const { mutateAsync: deleteVote } = useDeleteVote(promiseId);
   const { mutateAsync: confirmPlace } = useConfirmPlace(promiseId);
-
+  const { mutateAsync: revote } = usePostRevote(promiseId);
 
   const candidates: Candidate[] = candidatePlaces.map(c => ({
     id: c.id,
@@ -109,8 +109,9 @@ export const useVoteResult = ({
 
   const buttonDisabled = isRevote ? false : !hasVote;
 
-  const handleConfirmClick = () => {
+  const handleConfirmClick = async () => {
     if (isTie && !isRevote && !isRevoteTie) {
+      await revote();  // 재투표
       setIsRevote(true);
     } else {
       const target = myVote.length > 0

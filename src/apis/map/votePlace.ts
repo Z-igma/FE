@@ -37,3 +37,9 @@ export const confirmPlace = async (promiseId: string, body: ConfirmPlaceRequest)
   const response = await instance.post(`/promises/${promiseId}/confirmed`, body);
   return response.data;
 };
+
+// 재투표
+export const postRevote = async (promiseId: string): Promise<ApiEnvelopeNullable<null>> => {
+  const response = await instance.post(`/promises/${promiseId}/revote`);
+  return response.data;
+};

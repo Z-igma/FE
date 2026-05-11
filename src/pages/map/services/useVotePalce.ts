@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { addCandidatePlace, confirmPlace, deleteCandidatePlace, deleteVote, getCandidatePlaces, postVote } from '@/apis/map/votePlace';
+import { addCandidatePlace, confirmPlace, deleteCandidatePlace, deleteVote, getCandidatePlaces, postRevote, postVote } from '@/apis/map/votePlace';
 import type { AddCandidatePlaceRequest, ConfirmPlaceRequest, PostVoteRequest } from '@/types/map/votePlace.type';
 import axios from 'axios';
 
@@ -121,6 +121,24 @@ export const useConfirmPlace = (promiseId?: string) => {
     },
     onError: (error) => {
       console.error('장소 확정 실패: ', error);
+    },
+  });
+};
+
+// 재투표
+export const usePostRevote = (promiseId?: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => {
+      if (!promiseId) return Promise.reject(new Error("Promise ID is required"));
+      return postRevote(promiseId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['candidatePlaces', promiseId] });
+      queryClient.invalidateQueries({ queryKey: ['promise', Number(promiseId)] });
+    },
+    onError: (error) => {
+      console.error('재투표 시작 실패: ', error);
     },
   });
 };
