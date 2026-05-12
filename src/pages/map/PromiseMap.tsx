@@ -46,13 +46,13 @@ const PromiseMap = () => {
   useEffect(() => {
     if (!inviteCode) return; // inviteCode 없으면 그냥 일반 접근
 
-    if (!accessToken) {
-      // 로그인 안 됐으면 저장하고 로그인 페이지로
-      sessionStorage.setItem('inviteCode', inviteCode);
-      sessionStorage.setItem('redirectPage', `/map/${promiseId}`);
-      navigate('/login');
-      return;
-    }
+    // if (!accessToken) {
+    //   // 로그인 안 됐으면 저장하고 로그인 페이지로
+    //   sessionStorage.setItem('inviteCode', inviteCode);
+    //   sessionStorage.setItem('redirectPage', `/map/${promiseId}`);
+    //   navigate('/login');
+    //   return;
+    // }
 
     joinPromise(inviteCode);
   }, [inviteCode, accessToken]);
