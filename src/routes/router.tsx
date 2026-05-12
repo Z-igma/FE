@@ -22,13 +22,15 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: '/home', element: <Home /> },
-      { path: '/map', element: <Map /> },
-      { path: '/map/:promiseId', element: <PromiseMap /> },
-      { path: '/map/:promiseId/vote', element: <VoteResult /> },
-      { path: '/map/:promiseId/confirmed', element: <ConfirmedResult /> },
+
       {
         element: <ProtectedRoute />,
         children: [
+          { path: '/map', element: <Map /> },
+          { path: '/map/:promiseId', element: <PromiseMap /> },
+          { path: '/map/:promiseId/vote', element: <VoteResult /> },
+          { path: '/map/:promiseId/confirmed', element: <ConfirmedResult /> },
+
           { path: '/promise', element: <Promise /> },
           { path: '/promise/create', element: <CreatePromiseForm /> },
           { path: '/account', element: <Account /> },

@@ -60,7 +60,7 @@ const Home = () => {
         <p className="text-[#B2B2B2] font-Pretendard font-semibold text-[0.75rem] leading-4.2">
           지난 약속 {pastPromises.length}
         </p>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 pb-60">
           {pastPromises.map(promise => (
             <PromiseCard
               key={promise.id}

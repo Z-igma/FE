@@ -39,12 +39,12 @@ const PromiseMap = () => {
   const { data: promise } = usePromiseDetail(parsedPromiseId);
   const { members } = usePresence(promiseId);
 
-  const {accessToken} = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   const { mutate: joinPromise } = usePostJoinPromise();
 
   useEffect(() => {
-    if (!inviteCode) return;  // inviteCode 없으면 그냥 일반 접근
+    if (!inviteCode) return; // inviteCode 없으면 그냥 일반 접근
 
     if (!accessToken) {
       // 로그인 안 됐으면 저장하고 로그인 페이지로
@@ -101,7 +101,7 @@ const PromiseMap = () => {
   const candidatePlacesCount = candidatePlacesResponse?.data.candidateCount;
 
   console.log('candidatePlacesResponse: ', candidatePlacesResponse);
-  
+
   const isConfirmed = candidatePlaces?.some(c => c.isConfirmed) ?? false;
 
   useEffect(() => {

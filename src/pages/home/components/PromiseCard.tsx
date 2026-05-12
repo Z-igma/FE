@@ -50,7 +50,7 @@ const PromiseCard = ({
         (memberCount === 1 ? (
           <div className="flex w-full justify-between gap-15">
             {isLeader && (
-              <div onClick={(e) => {e.stopPropagation(); postPromiseInviteCodeHandler(promiseId.toString())}} className="flex items-center p-1.5 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
+              <div onClick={(e) => {e.stopPropagation(); postPromiseInviteCodeHandler(promiseId.toString())}} className="flex items-center w-full p-1.5 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px]">
                 <img src={MemberInvitePlusIcon} />
                 <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
                   친구를 초대하기
