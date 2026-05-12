@@ -37,12 +37,12 @@ const PromiseMap = () => {
   const parsedPromiseId = Number(promiseId);
   const { data: promise } = usePromiseDetail(parsedPromiseId);
 
-  const {accessToken} = useAuthStore();
+  const { accessToken } = useAuthStore();
 
   const { mutate: joinPromise } = usePostJoinPromise();
 
   useEffect(() => {
-    if (!inviteCode) return;  // inviteCode 없으면 그냥 일반 접근
+    if (!inviteCode) return; // inviteCode 없으면 그냥 일반 접근
 
     if (!accessToken) {
       // 로그인 안 됐으면 저장하고 로그인 페이지로
@@ -97,7 +97,7 @@ const PromiseMap = () => {
   const candidatePlacesCount = candidatePlacesResponse?.data.candidateCount;
 
   console.log('candidatePlacesResponse: ', candidatePlacesResponse);
-  
+
   const isConfirmed = candidatePlaces?.some(c => c.isConfirmed) ?? false;
 
   useEffect(() => {
@@ -289,11 +289,14 @@ const PromiseMap = () => {
             {promise.members.map((member, i) => (
               <div
                 key={member.userId}
-                className={`flex items-center ${isCardExpanded ? 'gap-2' : '-ml-1.5 first:ml-0'}`}
+                className={`flex items-center shrink-0 ${isCardExpanded ? 'gap-2' : ''}`}
               >
                 <img
                   src={member.profileImageUrl ?? ''}
-                  className="w-6 h-6 rounded-full gap-[-4px]"
+                  className="w-6 h-6 rounded-full ring-2 ring-white shrink-0"
+                  // style={{
+                  //   marginLeft: isCardExpanded ? 0 : i === 0 ? 0 : '-4px',
+                  // }}
                   alt="참여자"
                 />
                 {isCardExpanded && (
