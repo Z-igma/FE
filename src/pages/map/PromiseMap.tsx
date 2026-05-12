@@ -20,7 +20,8 @@ import CommentIcon from '@/assets/images/map/commentIcon.svg';
 import { useGetCandidatePlaces } from './services/useVotePalce';
 import { usePromiseDetail } from './services/usePromiseDetail';
 import { useAuthStore } from '@/stores/authStore';
-import { usePostJoinPromise } from '@/apis/apiHooks/usePromiseInvite';
+import { usePostJoinPromise, usePostPromiseInviteCode } from '@/apis/apiHooks/usePromiseInvite';
+import { usePresence } from './hooks/usePresence';
 
 const PromiseMap = () => {
   const [bounds, setBounds] = useState<GetCommentsParams>({
@@ -36,6 +37,7 @@ const PromiseMap = () => {
   const { promiseId } = useParams();
   const parsedPromiseId = Number(promiseId);
   const { data: promise } = usePromiseDetail(parsedPromiseId);
+  const { members } = usePresence(promiseId);
 
   const { accessToken } = useAuthStore();
 
@@ -91,6 +93,8 @@ const PromiseMap = () => {
   const [showToast, setShowToast] = useState(false);
   const hasCheckedInitial = useRef(false);
   const [isCardExpanded, setIsCardExpanded] = useState(false);
+  
+  const { mutate: postPromiseInviteCodeHandler } = usePostPromiseInviteCode();
 
   const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
   const candidatePlaces = candidatePlacesResponse?.data.candidates;
@@ -286,8 +290,8 @@ const PromiseMap = () => {
           <div
             className={`flex ${isCardExpanded ? 'flex-col gap-2' : 'flex-row'}`}
           >
-            {promise.members.map((member, i) => (
-               <div
+            {members.map((member, i) => (
+              <div
                 key={member.userId}
                 className={`flex items-center shrink-0 ${isCardExpanded ? 'gap-2' : ''}`}
                 style={{
@@ -312,7 +316,7 @@ const PromiseMap = () => {
           </div>
 
           {isLeader && isCardExpanded && (
-            <div className="px-3 py-1 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px] cursor-pointer">
+            <div onClick={(e) => {e.stopPropagation(); if (!promiseId) return; postPromiseInviteCodeHandler(promiseId.toString())}} className="px-3 py-1 bg-[#EAF2FF] border border-[#C0D7FD] rounded-[10px] cursor-pointer">
               <p className="text-[#00408E] font-Pretendard font-regular text-[0.75rem] leading-4.2">
                 멤버 초대하기
               </p>

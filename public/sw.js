@@ -1,4 +1,6 @@
 // Service Worker
+self.__WB_MANIFEST; //VitePWA가 파일 캐시 목록을 넣어주는 자리
+
 self.addEventListener('push', event => {
   const data = event.data?.json();
 
