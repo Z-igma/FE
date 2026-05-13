@@ -16,6 +16,7 @@ import { useMapSheet } from './hooks/useMapSheet';
 import { useComment } from './hooks/useComment';
 import type { GetCommentsParams } from '@/types/map/comment.type';
 import CustomMarkerIcon from '@/assets/images/map/customMarkerIcon.svg';
+import AddedMarkerIcon from '@/assets/images/map/addedMarkerIcon.svg';
 import CommentIcon from '@/assets/images/map/commentIcon.svg';
 import { useGetCandidatePlaces } from './services/useVotePalce';
 import { usePromiseDetail } from './services/usePromiseDetail';
@@ -99,6 +100,8 @@ const PromiseMap = () => {
   const { data: candidatePlacesResponse } = useGetCandidatePlaces(promiseId);
   const candidatePlaces = candidatePlacesResponse?.data.candidates;
   const candidatePlacesCount = candidatePlacesResponse?.data.candidateCount;
+  const maxVoteCount = Math.max(...(candidatePlaces?.map(c => c.voteInfo.voteCount) ?? []));
+  const topVotedCandidates = candidatePlaces?.filter(c => c.voteInfo.voteCount === maxVoteCount);
 
   console.log('candidatePlacesResponse: ', candidatePlacesResponse);
 
@@ -177,7 +180,7 @@ const PromiseMap = () => {
                     lng: candidatePlace.longitude,
                   }}
                   image={{
-                    src: CustomMarkerIcon,
+                    src: topVotedCandidates?.includes(candidatePlace) ? AddedMarkerIcon : CustomMarkerIcon,
                     size: { width: 30, height: 30 },
                   }}
                   onClick={() =>
